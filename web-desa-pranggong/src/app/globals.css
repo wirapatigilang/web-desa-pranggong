@@ -10,6 +10,17 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-fraunces);
+
+  /* Identitas visual "Bumi Pranggong" — moss green + kertas hangat */
+  --color-moss-900: #16241a;
+  --color-moss-700: #24402a;
+  --color-moss-600: #2f5233;
+  --color-moss-500: #3f6b45;
+  --color-spring-400: #c7d65e;
+  --color-paper-50: #fbf9f1;
+  --color-paper-100: #f3eedd;
+  --color-ink-900: #1c2a1e;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +34,23 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Motif grid diagonal — jejak dari referensi visual Bumi Pranggong */
+.bg-grid-diagonal {
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.07) 0px,
+      rgba(255, 255, 255, 0.07) 1px,
+      transparent 1px,
+      transparent 28px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, 0.07) 0px,
+      rgba(255, 255, 255, 0.07) 1px,
+      transparent 1px,
+      transparent 28px
+    );
 }

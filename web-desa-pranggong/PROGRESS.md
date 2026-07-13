@@ -32,6 +32,15 @@
 
 ## Log Pengerjaan
 
+### 2026-07-14 — Redesign visual homepage: identitas "Bumi Pranggong"
+- Install plugin `frontend-design` (marketplace `anthropics/claude-code` tidak ditemukan, dipasang via marketplace default) untuk memandu proses desain.
+- Redesign homepage (`src/app/page.tsx`) mengikuti referensi moodboard KKN-R UNDIP 2026 (kartu ID/lanyard, wordmark serif "Bumi Pranggong", grid diagonal) — bukan sekadar restyle warna, tapi identitas visual baru untuk web desa.
+- Token desain baru di `src/app/globals.css`: palet `moss-*` (hijau tua), `spring-400` (aksen lime), `paper-*` (krem hangat), `ink-900`, plus utility `.bg-grid-diagonal` untuk tekstur grid diagonal ala referensi.
+- Font display baru: `Fraunces` (via `next/font/google`, ditambahkan di `src/app/layout.tsx` sebagai `--font-fraunces` / `font-display`), dipakai untuk heading & wordmark. Body tetap Geist Sans, label/eyebrow pakai Geist Mono.
+- Elemen signature: kartu ID bergaya lanyard/badge (rotasi -3°, lubang grommet, tali) untuk section "Sambutan Kepala Desa" — elemen paling khas di halaman, diadaptasi dari mockup "Who Are We?" di referensi.
+- `Navbar` & `Footer` direcolor mengikuti palet baru (`moss-*`/`paper-*`/`spring-400`) supaya konsisten dengan hero baru — struktur & logika tidak diubah, hanya class warna.
+- **Belum diverifikasi**: `npm run lint` & `npm run build` belum sempat dijalankan (diinterupsi user) — cek ini di sesi berikutnya sebelum menganggap perubahan ini final.
+
 ### 2026-07-13 — Tahap 1: Setup project, layout dasar, navigasi, homepage
 - Dibuat `requirement.md` (requirement + checklist semua fitur, 3 program KKN + fitur dasar web desa).
 - Setup `site-config.ts`, `Navbar`, `Footer`, root `layout.tsx` (metadata title/description desa).

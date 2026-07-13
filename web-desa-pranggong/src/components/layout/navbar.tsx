@@ -10,14 +10,14 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-emerald-900/10 bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-moss-900/10 bg-paper-50/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2 font-semibold text-emerald-900"
+          className="flex items-center gap-2 font-display font-semibold text-ink-900"
           onClick={() => setOpen(false)}
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-700 text-sm text-white">
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-moss-600 text-sm text-paper-50">
             DP
           </span>
           <span className="text-lg leading-tight">{siteConfig.name}</span>
@@ -35,8 +35,8 @@ export default function Navbar() {
                 href={link.href}
                 className={`rounded-full px-3 py-2 text-sm font-medium transition-colors ${
                   active
-                    ? "bg-emerald-700 text-white"
-                    : "text-emerald-950 hover:bg-emerald-50"
+                    ? "bg-moss-600 text-paper-50"
+                    : "text-ink-900 hover:bg-moss-600/10"
                 }`}
               >
                 {link.label}
@@ -47,7 +47,7 @@ export default function Navbar() {
 
         <button
           type="button"
-          className="flex h-9 w-9 items-center justify-center rounded-md text-emerald-900 md:hidden"
+          className="flex h-9 w-9 items-center justify-center rounded-md text-ink-900 md:hidden"
           aria-label="Buka menu navigasi"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
@@ -73,7 +73,7 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <nav className="border-t border-emerald-900/10 bg-white px-4 py-2 md:hidden">
+        <nav className="border-t border-moss-900/10 bg-paper-50 px-4 py-2 md:hidden">
           {navLinks.map((link) => {
             const active =
               link.href === "/"
@@ -86,8 +86,8 @@ export default function Navbar() {
                 onClick={() => setOpen(false)}
                 className={`block rounded-md px-3 py-2 text-sm font-medium ${
                   active
-                    ? "bg-emerald-700 text-white"
-                    : "text-emerald-950 hover:bg-emerald-50"
+                    ? "bg-moss-600 text-paper-50"
+                    : "text-ink-900 hover:bg-moss-600/10"
                 }`}
               >
                 {link.label}
