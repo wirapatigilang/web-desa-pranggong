@@ -120,7 +120,7 @@ Ditambah fitur-fitur dasar profil desa agar website layak disebut "website desa"
 
 - [ ] Framework: Next.js (App Router) + TypeScript
 - [ ] Styling: Tailwind CSS
-- [ ] Peta interaktif: pilih salah satu — Leaflet (gratis, open-source) atau Google Maps Embed API
+- [x] Peta interaktif: **Leaflet** (gratis, open-source) — dipilih & mulai diimplementasi
 - [ ] Database untuk blog & data pinpoint: pilih salah satu — SQLite (lokal/demo) atau PostgreSQL (produksi), dengan ORM (mis. Prisma)
 - [ ] Autentikasi admin: solusi sederhana (mis. NextAuth / credential-based)
 - [ ] Hosting/deploy: Vercel (frontend) + database hosting terpisah jika diperlukan
@@ -128,8 +128,8 @@ Ditambah fitur-fitur dasar profil desa agar website layak disebut "website desa"
 ## 7. Milestone / Tahapan Pengerjaan
 
 - [x] **Tahap 1** — Setup project, layout dasar, navigasi, homepage
-- [ ] **Tahap 2** — Halaman profil desa & fitur dasar lainnya
-- [ ] **Tahap 3** — Peta interaktif + data pinpoint kontak
+- [ ] **Tahap 2** — Peta interaktif + data pinpoint kontak *(diurutkan lebih dulu dari rencana awal — lihat PROGRESS.md 2026-07-14)*
+- [ ] **Tahap 3** — Halaman profil desa & fitur dasar lainnya
 - [ ] **Tahap 4** — Halaman Rocket Stove
 - [ ] **Tahap 5** — Sistem CRUD blog + autentikasi admin
 - [ ] **Tahap 6** — Testing, responsivitas, deploy, serah terima ke perangkat desa
