@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import Eyebrow from "@/components/ui/eyebrow";
 import PostList from "@/components/blog/post-list";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "Berita & Pengumuman",
   description: "Pengumuman resmi dan berita kegiatan terbaru Desa Pranggong.",
 };
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const posts = await prisma.post.findMany({
+    orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
+  });
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <Eyebrow>Kabar Desa</Eyebrow>
@@ -20,13 +25,8 @@ export default function BlogPage() {
       </p>
 
       <div className="mt-8">
-        <PostList />
+        <PostList posts={posts} />
       </div>
-
-      <p className="mt-10 text-xs text-ink-900/50">
-        Halaman ini masih menampilkan data contoh. Sistem CRUD penuh (tambah,
-        edit, hapus konten oleh admin desa) akan dibangun pada Tahap 5.
-      </p>
     </div>
   );
 }

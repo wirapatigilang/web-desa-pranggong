@@ -11,9 +11,10 @@
 - **Urutan tahap diubah atas permintaan user (2026-07-14)**: peta interaktif dimajukan jadi **Tahap 2**, profil desa mundur jadi **Tahap 3** (lihat log di bawah & `requirement.md` §7).
 - Tahap 2 (peta interaktif): prototype ada di `/peta-desa`, belum final (koordinat placeholder).
 - Tahap 3 — Profil Desa: `/profil-desa` sudah diisi (sejarah, visi-misi, data geografis/demografis, struktur organisasi), **semua isinya masih placeholder eksplisit** (belum data resmi dari perangkat desa — lihat `src/lib/village-profile.ts`). Sisa: layanan publik, potensi wisata, galeri.
-- **Tahap 4 (Rocket Stove) sengaja di-skip dulu** atas permintaan user (2026-07-15) — Tahap 5 (Berita/Pengumuman) dikerjakan lebih dulu.
-- Tahap berjalan: **Tahap 5 sebagian — listing "Berita & Pengumuman"** (`/blog`) sudah jadi dengan data statis + filter tipe. Sistem CRUD sungguhan (create/update/delete) + auth admin + database (Prisma/Postgres) BELUM dikerjakan.
-- Tahap berikutnya: lanjut Rocket Stove (Tahap 4) yang sempat di-skip, ATAU lanjut CRUD+auth+DB untuk blog (sisa Tahap 5) — tunggu arahan user.
+- **Tahap 4 (Rocket Stove) masih di-skip** — belum dikerjakan.
+- **Tahap 5 — SELESAI (inti)**: CRUD Berita/Pengumuman + auth admin + database sudah jalan. Detail lengkap di log 2026-07-15 "Tahap 5". Sisa: form upload gambar cover (belum ada), pagination (belum perlu, data masih sedikit).
+- Tahap berikutnya: Rocket Stove (Tahap 4) yang sempat di-skip, ATAU sisa Tahap 3 (layanan publik/potensi wisata/galeri), ATAU poles Tahap 5 (upload gambar) — tunggu arahan user.
+- **PENTING sebelum deploy**: ganti `ADMIN_EMAIL`/`ADMIN_PASSWORD` di `.env` (masih nilai contoh) dan `BETTER_AUTH_SECRET`, lalu jalankan `prisma db seed` di environment produksi. Tidak ada form pendaftaran publik by design — akun admin cuma bisa dibuat lewat seed script.
 
 ## Arsitektur / Konvensi Project
 
@@ -23,7 +24,10 @@
 - `src/components/ui/page-placeholder.tsx` — komponen placeholder generik untuk halaman yang belum digarap kontennya.
 - Tema warna: tampilan resmi pemerintah desa — token custom di `globals.css` (`moss-*` hijau institusional, `gold-600`/`gold-300` aksen emas, `merah-600` khusus garis kop surat, `paper-*`, `ink-900`), font display `Source Serif 4` + body `Geist Sans` + utility `Geist Mono`. Label section pakai komponen bersama `src/components/ui/eyebrow.tsx`, jangan bikin pola eyebrow baru. Belum ada dark mode.
 - Peta interaktif pakai `leaflet` + `react-leaflet`. Komponen peta WAJIB client-only (`"use client"` + `next/dynamic({ ssr: false })`) karena Leaflet akses `window`. Data pinpoint terpusat di `src/lib/village-locations.ts` (jangan hardcode koordinat di komponen).
-- Belum ada database/CMS, belum ada auth — akan masuk di Tahap 5 (CRUD blog).
+- **Routing**: root `src/app/layout.tsx` sekarang MINIMAL (cuma font + html/body + `<Toaster/>`), TIDAK ada Navbar/Footer di situ lagi. Semua halaman publik ada di route group `src/app/(site)/` yang punya `layout.tsx` sendiri (Navbar+Footer+palet moss/paper). `/admin/*` punya `layout.tsx` sendiri juga (shadcn light theme, tanpa Navbar/Footer publik). Kalau nambah halaman publik baru, taruh di `src/app/(site)/`, BUKAN langsung di `src/app/`.
+- **Next.js 16**: file konvensi `middleware.ts` sudah deprecated, diganti `proxy.ts` (fungsi export bernama `proxy`, bukan `middleware`) — lihat `node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/proxy.md` kalau perlu detail lebih lanjut.
+- **Database & Auth**: Prisma 7 (generator baru `prisma-client`, BUKAN `prisma-client-js` lama) + PostgreSQL lokal (`web_desa_pranggong`, dibuat via `createdb`) + Better Auth (email/password saja, TANPA sign-up publik). Detail teknis penting di log 2026-07-15 "Tahap 5" — WAJIB dibaca sebelum utak-atik Prisma/auth, karena konvensinya beda signifikan dari Prisma versi lama yang mungkin diasumsikan agent lain.
+- Data Berita/Pengumuman sekarang dari database (`prisma.post`), BUKAN lagi array statis. `src/lib/posts.ts` cuma nyisa `postTypeLabels` (label tampilan).
 
 ## Struktur Route (app/)
 
@@ -33,10 +37,54 @@
 | `/profil-desa` | Selesai (Tahap 3) — sejarah, visi-misi, data wilayah, struktur organisasi; isi konten masih placeholder |
 | `/peta-desa` | Prototype Tahap 2 — peta interaktif Leaflet aktif, koordinat masih placeholder |
 | `/program-kerja/rocket-stove` | Stub placeholder — konten di Tahap 4 (multidisiplin 2) |
-| `/blog` | Selesai (listing) — "Berita & Pengumuman" gabungan dengan filter tipe; data masih statis, CRUD sungguhan di Tahap 5 |
+| `/blog` | Selesai — "Berita & Pengumuman" dari database, filter tipe |
 | `/kontak` | Selesai — menampilkan data dari `contactInfo` |
+| `/admin/login` | Selesai — form login (Better Auth email/password) |
+| `/admin` | Selesai — dashboard: tabel post, tombol tambah/edit/hapus |
+| `/admin/posts/new`, `/admin/posts/[id]/edit` | Selesai — form create/edit (shadcn) |
 
 ## Log Pengerjaan
+
+### 2026-07-15 — Tahap 5: Dashboard admin (auth + database + CRUD), shadcn light theme
+User minta eksplisit: "dashboard admin, auth + DB, Better Auth, UI shadcn light theme". Ini perubahan besar, banyak keputusan teknis non-obvious — dibaca pelan-pelan sebelum utak-atik bagian ini.
+
+**Database — Prisma 7 (BUKAN konvensi Prisma lama)**
+- Prisma yang ter-install versi **7.8.0**, generator default berubah dari `prisma-client-js` (lama, paket `@prisma/client` di node_modules) jadi **`prisma-client`** (baru) yang men-generate **source TypeScript mentah** ke `src/generated/prisma/` (bukan package siap pakai). Konsekuensi:
+  - Import client dari path eksplisit **`src/generated/prisma/client`** (bukan folder index, tidak ada `index.ts`).
+  - `PrismaClient` WAJIB dikonstruksi dengan **driver adapter** eksplisit — `new PrismaClient({ adapter: new PrismaPg({ connectionString: ... }) })` dari paket `@prisma/adapter-pg` (+ `pg`). Tanpa adapter, constructor error.
+  - Ada file baru **`prisma.config.ts`** (bukan lagi konfigurasi lewat `schema.prisma` doang) — path schema, folder migrations, dan **seed command** didefinisikan di sini. CLI Prisma TIDAK auto-load `.env`; `prisma.config.ts` yang eksplisit `import "dotenv/config"`.
+  - Seed command di `prisma.config.ts` diset `"npx tsx prisma/seed.ts"` — sempat gagal dengan `node prisma/seed.ts` polos karena Node ESM native butuh ekstensi eksplisit di semua import relatif (`.ts`), sementara kode project (untuk dikonsumsi Next.js) sengaja tanpa ekstensi. `tsx` dipasang sebagai dev dependency supaya resolusinya kompatibel dengan konvensi import yang sudah ada di project, tanpa perlu ubah gaya import di seluruh kode.
+- Database lokal: Postgres via Homebrew sudah jalan di mesin ini, dibuat database baru `web_desa_pranggong` (`createdb web_desa_pranggong`) — tidak menyentuh database lain yang sudah ada (`flex_information_system`). `DATABASE_URL` di `.env`.
+- Model `Post` (`prisma/schema.prisma`): `id, type (enum pengumuman|berita), title, slug (unique), excerpt, content, pinned, createdAt, updatedAt`.
+
+**Auth — Better Auth**
+- Model `User/Session/Account/Verification` di `schema.prisma` **DIGENERATE OTOMATIS** oleh `./node_modules/.bin/better-auth generate --config src/lib/auth.ts --yes` (bukan ditulis manual — field-nya harus persis sesuai yang diharapkan adapter Prisma Better Auth, salah nama field bikin runtime error yang sulit dilacak).
+- `src/lib/auth.ts`: `betterAuth({ database: prismaAdapter(prisma, { provider: "postgresql" }), emailAndPassword: { enabled: true, disableSignUp: true }, plugins: [nextCookies()] })`. **`disableSignUp: true` sengaja** — tidak ada halaman/form registrasi publik. Satu-satunya cara bikin akun admin: `prisma/seed.ts` (pakai `hashPassword` dari `better-auth/crypto` + `prisma.user.create` langsung, BUKAN lewat `auth.api.signUpEmail` karena `disableSignUp` juga memblokir pemanggilan internal itu, bukan cuma endpoint HTTP-nya).
+- API route: `src/app/api/auth/[...all]/route.ts` pakai `toNextJsHandler`. Client: `src/lib/auth-client.ts` pakai `createAuthClient()` tanpa `baseURL` (same-origin).
+- Proteksi route: `src/proxy.ts` (lihat catatan Next.js 16 di atas) — cek `getSessionCookie()` dari `better-auth/cookies`, redirect ke `/admin/login` kalau tidak ada cookie sesi. Ini hanya gate cepat (tanpa hit DB); setiap server action CRUD (`src/lib/actions/posts.ts`) tetap panggil `auth.api.getSession()` sendiri sebagai lapisan kedua (defense in depth) — jangan hapus pengecekan di action meskipun proxy sudah ada.
+- Kredensial admin pertama: `ADMIN_EMAIL`/`ADMIN_PASSWORD` di `.env` (nilai contoh, **WAJIB diganti sebelum deploy**), dibuat lewat `prisma db seed`.
+
+**shadcn/ui — light theme untuk admin**
+- `npx shadcn@latest init -y -t next -b radix --preset nova` (preset lain: Vega/Maia/Lyra/dst — dipilih Nova karena default/paling netral). CLI-nya interaktif meski dikasih `-y`, harus pakai `--preset` eksplisit untuk skip prompt.
+- shadcn init **auto-merge** ke `globals.css` yang sudah ada (token `moss-*`/`gold-*`/`paper-*`/`ink-900` custom kita TIDAK ditimpa, cuma ditambah token shadcn `--background/--primary/--card/dst`). **Tapi ada bug hasil merge**: `--font-sans: var(--font-sans);` jadi self-reference (harusnya `var(--font-geist-sans)`) — sudah diperbaiki manual. Kalau jalankan `shadcn add`/`init` lagi di masa depan, **cek ulang bagian ini**, siapa tahu ke-overwrite lagi.
+- shadcn nambah `@layer base { body { @apply bg-background text-foreground; } }` — ini AMAN (tidak mengulang bug "unlayered CSS" yang pernah terjadi sebelumnya) karena berada di dalam `@layer base`, dan Tailwind v4 selalu prioritaskan `@layer utilities` di atas `@layer base` — jadi className eksplisit di masing-masing route group layout (`(site)` pakai `bg-paper-50`, `admin` pakai `bg-background`) tetap menang.
+- "Light theme" dicapai dengan **tidak pernah mengaktifkan class `.dark`** di mana pun (tidak pasang `next-themes` atau toggle) — variabel `.dark { ... }` yang digenerate shadcn ada di CSS tapi tidak pernah dipakai. Sudah diverifikasi: tidak ada `class="dark"` di HTML manapun.
+- Komponen yang ditambah: `button, input, label, card, table, textarea, badge, dropdown-menu, sonner, separator, alert-dialog, select, checkbox`. Tidak pakai komponen `form` (react-hook-form+zod) — form CRUD dibangun manual pakai `useActionState` + native FormData, dianggap cukup untuk form sesederhana ini.
+
+**Restrukturisasi routing (diperlukan supaya admin & situs publik bisa beda shell)**
+- Semua route publik (`page.tsx`, `profil-desa/`, `peta-desa/`, `program-kerja/`, `blog/`, `kontak/`) dipindah ke `src/app/(site)/` dengan `layout.tsx` sendiri (Navbar+Footer). Root `src/app/layout.tsx` jadi minimal. `/admin` punya `layout.tsx` sendiri (shadcn, tanpa Navbar/Footer publik). URL tidak berubah (route group tidak masuk path).
+
+**CRUD**
+- `src/lib/actions/posts.ts` (server actions): `createPost`, `updatePost`, `deletePost` — semua cek sesi dulu, validasi field wajib, auto-generate `slug` unik (increment suffix kalau bentrok), `revalidatePath` ke `/admin`, `/blog`, `/`.
+- Dashboard `/admin`: tabel post (shadcn Table) + badge "Disematkan" + tombol Edit/Hapus (`AlertDialog` konfirmasi sebelum hapus).
+- Form create/edit dipakai bareng lewat `src/components/admin/post-form.tsx` (props `action` + `defaultValues`).
+- 2 post yang sebelumnya statis (`src/lib/posts.ts`) dimigrasikan ke DB lewat `prisma/seed.ts` (fungsi `seedPosts`, pakai `upsert` supaya aman dijalankan berkali-kali). Homepage & `/blog` sekarang query `prisma.post.findMany()` langsung (server component, bukan lagi baca array statis).
+
+**Verifikasi**
+- `npm run lint` bersih, `npm run build` sukses (12 route, admin routes ter-render dinamis `ƒ` sesuai ekspektasi karena butuh sesi/DB).
+- Smoke test end-to-end lewat curl: `/admin` tanpa cookie → 307 ke `/admin/login` ✓. Sign-in via `POST /api/auth/sign-in/email` dengan kredensial seed → 200 + token ✓. `/admin` dengan cookie sesi → 200, tabel post muncul ✓. Homepage & `/blog` menampilkan 2 post dari DB (termasuk badge "Disematkan" untuk yang `pinned: true`) ✓. Tidak ada `class="dark"` di HTML manapun (light theme terjaga) ✓.
+- **Belum diuji lewat browser sungguhan**: submit form create/edit (pakai shadcn `Select`+`Checkbox` yang form-participation-nya mengandalkan hidden input bawaan Radix — secara kode sudah benar dan `name` prop terkonfirmasi diteruskan ke Radix primitive, tapi belum diklik manual di browser). **Rekomendasi: coba create/edit/delete post beneran lewat UI sebelum anggap Tahap 5 100% selesai.**
+- **Belum dikerjakan**: upload gambar cover (requirement.md §4.3 minta ini), pagination (belum perlu, data masih sedikit).
 
 ### 2026-07-15 — Blog digabung jadi "Pengumuman & Berita" + section terpisah di homepage
 - Diskusi dengan user: gabung vs pisah untuk fitur Pengumuman/Berita → diputuskan **gabung** (satu model dengan field `type`), karena struktur datanya identik dan bikin 2 CRUD terpisah di Tahap 5 nanti cuma nambah kerjaan tanpa manfaat. Rocket Stove (Tahap 4) sengaja di-skip dulu atas permintaan user.

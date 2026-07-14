@@ -68,16 +68,16 @@ Ditambah fitur-fitur dasar profil desa agar website layak disebut "website desa"
 
 > Keputusan (2026-07-15): "Blog" digabung jadi satu model **Pengumuman & Berita** (field `type`), bukan dua fitur terpisah — lihat `src/lib/posts.ts` dan PROGRESS.md.
 
-- [ ] **Create** — form tambah postingan (judul, konten, gambar cover, kategori, tanggal)
-- [ ] **Read**
-  - [x] Halaman daftar/listing blog — **data statis**, belum pagination (belum perlu, isi masih 2 post contoh)
-  - [ ] Halaman detail per-postingan
+- [x] **Create** — form tambah postingan di `/admin/posts/new` (judul, ringkasan, konten, kategori, sematkan) — **belum ada field gambar cover**
+- [x] **Read**
+  - [x] Halaman daftar/listing blog — dari database, belum pagination (belum perlu, isi masih sedikit)
+  - [ ] Halaman detail per-postingan (belum ada route `/blog/[slug]`)
   - [x] Pencarian/filter berdasarkan kategori (tipe Pengumuman/Berita) — filter kata kunci bebas belum ada
-- [ ] **Update** — form edit postingan yang sudah ada
-- [ ] **Delete** — hapus postingan (dengan konfirmasi)
-- [ ] Autentikasi admin sederhana (login) agar hanya perangkat desa yang bisa CRUD
-- [ ] Penyimpanan data (database — **Postgres + Prisma**, sudah ditetapkan di `CLAUDE.md` § Stack)
-- [ ] Upload gambar untuk cover/isi artikel
+- [x] **Update** — form edit di `/admin/posts/[id]/edit`
+- [x] **Delete** — tombol hapus + `AlertDialog` konfirmasi
+- [x] Autentikasi admin sederhana (Better Auth, email+password, tanpa sign-up publik — akun dibuat lewat `prisma/seed.ts`)
+- [x] Penyimpanan data — **Postgres + Prisma 7** (lihat PROGRESS.md 2026-07-15 untuk detail konvensi Prisma 7 yang berbeda dari versi lama)
+- [ ] Upload gambar untuk cover/isi artikel — belum dikerjakan
 - [ ] Validasi input form (judul & konten wajib diisi, dll.)
 
 ### 4.4 Fitur Dasar Website Desa (Pelengkap)
@@ -114,7 +114,7 @@ Ditambah fitur-fitur dasar profil desa agar website layak disebut "website desa"
 
 - [ ] Performa: waktu muat halaman wajar (< 3 detik pada koneksi normal)
 - [ ] Aksesibilitas dasar (kontras warna cukup, alt text pada gambar)
-- [ ] Keamanan dasar untuk fitur admin/CRUD (auth, proteksi route admin)
+- [x] Keamanan dasar untuk fitur admin/CRUD (Better Auth + `src/proxy.ts` proteksi route `/admin/*` + cek sesi ulang di tiap server action)
 - [ ] Dapat di-deploy dengan mudah (mis. Vercel) untuk demo/serah terima
 - [ ] Kode terstruktur agar mudah diserahterimakan ke perangkat desa/mahasiswa berikutnya
 
@@ -135,7 +135,7 @@ Ditambah fitur-fitur dasar profil desa agar website layak disebut "website desa"
 - [x] **Tahap 2** — Peta interaktif + data pinpoint kontak *(diurutkan lebih dulu dari rencana awal — lihat PROGRESS.md 2026-07-14; koordinat masih placeholder)*
 - [x] **Tahap 3** — Halaman profil desa *(sejarah/visi-misi/struktur/data wilayah selesai, isi masih placeholder; layanan publik/potensi desa/galeri belum)*
 - [ ] **Tahap 4** — Halaman Rocket Stove
-- [ ] **Tahap 5** — Sistem CRUD blog + autentikasi admin
+- [x] **Tahap 5** — Sistem CRUD blog + autentikasi admin *(inti selesai 2026-07-15: Better Auth + Prisma/Postgres + dashboard shadcn; sisa: upload gambar cover, halaman detail per-post)*
 - [ ] **Tahap 6** — Testing, responsivitas, deploy, serah terima ke perangkat desa
 
 ## 8. Pertanyaan Terbuka / Perlu Konfirmasi

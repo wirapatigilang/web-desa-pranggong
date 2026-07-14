@@ -1,21 +1,19 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { posts, postTypeLabels, type PostType } from "@/lib/posts";
+import { postTypeLabels } from "@/lib/posts";
+import type { Post, PostType } from "@/generated/prisma/client";
 
 const types = Object.keys(postTypeLabels) as PostType[];
 
-export default function PostList() {
+export default function PostList({ posts }: { posts: Post[] }) {
   const [activeType, setActiveType] = useState<PostType | "semua">("semua");
 
   const filtered = useMemo(() => {
-    return posts
-      .filter((post) => activeType === "semua" || post.type === activeType)
-      .sort((a, b) => {
-        if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
-        return b.date.localeCompare(a.date);
-      });
-  }, [activeType]);
+    return posts.filter(
+      (post) => activeType === "semua" || post.type === activeType,
+    );
+  }, [posts, activeType]);
 
   return (
     <div>
@@ -61,7 +59,13 @@ export default function PostList() {
                   </span>
                 )}
               </div>
-              <p className="mt-2 text-xs text-ink-900/40">{post.date}</p>
+              <p className="mt-2 text-xs text-ink-900/40">
+                {post.createdAt.toLocaleDateString("id-ID", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </p>
               <h3 className="mt-2 font-display text-lg font-semibold text-ink-900">
                 {post.title}
               </h3>

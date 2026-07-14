@@ -1,14 +1,19 @@
 import Link from "next/link";
 import Eyebrow from "@/components/ui/eyebrow";
 import { siteConfig } from "@/lib/site-config";
-import { postsByType, type Post } from "@/lib/posts";
+import { prisma } from "@/lib/prisma";
+import type { Post } from "@/generated/prisma/client";
 
 function PostCard({ post }: { post: Post }) {
   return (
     <article className="border border-moss-900/10 p-7">
       <div className="flex items-center gap-3">
         <p className="text-xs font-semibold uppercase tracking-wide text-ink-900/40">
-          {post.date}
+          {post.createdAt.toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })}
         </p>
         {post.pinned && (
           <span className="text-xs font-semibold uppercase tracking-wide text-gold-600">
@@ -41,9 +46,17 @@ const programs = [
   },
 ];
 
-export default function Home() {
-  const pengumuman = postsByType("pengumuman");
-  const berita = postsByType("berita");
+export default async function Home() {
+  const [pengumuman, berita] = await Promise.all([
+    prisma.post.findMany({
+      where: { type: "pengumuman" },
+      orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
+    }),
+    prisma.post.findMany({
+      where: { type: "berita" },
+      orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
+    }),
+  ]);
 
   return (
     <div className="flex flex-col">
