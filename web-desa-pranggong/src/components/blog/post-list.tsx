@@ -1,0 +1,81 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { posts, postTypeLabels, type PostType } from "@/lib/posts";
+
+const types = Object.keys(postTypeLabels) as PostType[];
+
+export default function PostList() {
+  const [activeType, setActiveType] = useState<PostType | "semua">("semua");
+
+  const filtered = useMemo(() => {
+    return posts
+      .filter((post) => activeType === "semua" || post.type === activeType)
+      .sort((a, b) => {
+        if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
+        return b.date.localeCompare(a.date);
+      });
+  }, [activeType]);
+
+  return (
+    <div>
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => setActiveType("semua")}
+          className={`border px-3 py-1.5 text-sm transition-colors ${
+            activeType === "semua"
+              ? "border-moss-600 bg-moss-600 text-paper-50"
+              : "border-moss-900/15 text-ink-900/70 hover:border-moss-600/50"
+          }`}
+        >
+          Semua
+        </button>
+        {types.map((type) => (
+          <button
+            key={type}
+            type="button"
+            onClick={() => setActiveType(type)}
+            className={`border px-3 py-1.5 text-sm transition-colors ${
+              activeType === type
+                ? "border-moss-600 bg-moss-600 text-paper-50"
+                : "border-moss-900/15 text-ink-900/70 hover:border-moss-600/50"
+            }`}
+          >
+            {postTypeLabels[type]}
+          </button>
+        ))}
+      </div>
+
+      {filtered.length > 0 ? (
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((post) => (
+            <article key={post.slug} className="border border-moss-900/10 p-7">
+              <div className="flex items-center gap-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gold-600">
+                  {postTypeLabels[post.type]}
+                </p>
+                {post.pinned && (
+                  <span className="text-xs font-semibold uppercase tracking-wide text-ink-900/40">
+                    Disematkan
+                  </span>
+                )}
+              </div>
+              <p className="mt-2 text-xs text-ink-900/40">{post.date}</p>
+              <h3 className="mt-2 font-display text-lg font-semibold text-ink-900">
+                {post.title}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-900/70">
+                {post.excerpt}
+              </p>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-8 text-sm text-ink-900/50">
+          Belum ada konten untuk kategori ini.
+        </p>
+      )}
+    </div>
+  );
+}

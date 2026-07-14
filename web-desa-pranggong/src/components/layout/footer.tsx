@@ -16,7 +16,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <h3 className="font-mono text-sm font-semibold uppercase tracking-wide text-spring-400">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-gold-300">
             Navigasi
           </h3>
           <ul className="mt-3 space-y-2 text-sm">
@@ -31,7 +31,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <h3 className="font-mono text-sm font-semibold uppercase tracking-wide text-spring-400">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-gold-300">
             Kontak
           </h3>
           <ul className="mt-3 space-y-2 text-sm text-paper-50/80">
@@ -44,7 +44,8 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-white/10 px-4 py-4 text-center text-xs text-paper-50/50 sm:px-6">
-        © {year} {siteConfig.fullName}. Dibuat dalam rangka program KKN.
+        © {year} {siteConfig.fullName}. Website resmi, dikembangkan bersama
+        Tim KKN.
       </div>
     </footer>
   );

@@ -1,14 +1,30 @@
 import Link from "next/link";
+import Eyebrow from "@/components/ui/eyebrow";
 import { siteConfig } from "@/lib/site-config";
+import { postsByType, type Post } from "@/lib/posts";
 
-const highlightPosts = [
-  {
-    title: "Selamat Datang di Website Desa Pranggong",
-    excerpt:
-      "Website ini dikembangkan untuk memudahkan warga dan masyarakat umum mengakses informasi seputar Desa Pranggong.",
-    date: "2026-07-13",
-  },
-];
+function PostCard({ post }: { post: Post }) {
+  return (
+    <article className="border border-moss-900/10 p-7">
+      <div className="flex items-center gap-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-ink-900/40">
+          {post.date}
+        </p>
+        {post.pinned && (
+          <span className="text-xs font-semibold uppercase tracking-wide text-gold-600">
+            Disematkan
+          </span>
+        )}
+      </div>
+      <h3 className="mt-3 font-display text-lg font-semibold text-ink-900">
+        {post.title}
+      </h3>
+      <p className="mt-2 text-sm leading-relaxed text-ink-900/70">
+        {post.excerpt}
+      </p>
+    </article>
+  );
+}
 
 const programs = [
   {
@@ -25,47 +41,24 @@ const programs = [
   },
 ];
 
-// Penanda visual khas — sudut bintang, dipakai secara terbatas sebagai aksen identitas.
-function BurstMark({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden="true"
-      className={className}
-    >
-      <path d="M12 1c1 7 4 10 11 11-7 1-10 4-11 11-1-7-4-10-11-11 7-1 10-4 11-11z" />
-    </svg>
-  );
-}
-
 export default function Home() {
+  const pengumuman = postsByType("pengumuman");
+  const berita = postsByType("berita");
+
   return (
     <div className="flex flex-col">
-      {/* Hero — wordmark "Bumi Pranggong", motif grid diagonal */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-moss-600 to-moss-900 text-paper-50">
-        <div
-          aria-hidden="true"
-          className="bg-grid-diagonal pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top_right,black,transparent_70%)]"
-        />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-          <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-spring-400">
-            <BurstMark className="h-4 w-4" />
-            Website Resmi Pemerintah Desa
-          </p>
+      {/* Hero — masthead resmi pemerintah desa */}
+      <section className="bg-gradient-to-b from-moss-700 to-moss-900 text-paper-50">
+        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+          <Eyebrow onDark>Pemerintah Desa Pranggong</Eyebrow>
 
-          <div className="mt-10">
-            <p className="font-display text-2xl italic text-spring-400 sm:text-3xl">
-              Bumi
-            </p>
-            <h1 className="font-display text-6xl font-semibold leading-[0.95] text-paper-50 sm:text-7xl md:text-8xl">
-              Pranggong
-            </h1>
-          </div>
+          <h1 className="mt-5 font-display text-4xl font-semibold leading-tight text-paper-50 sm:text-5xl">
+            {siteConfig.name}
+          </h1>
 
-          <p className="mt-6 font-mono text-xs uppercase tracking-[0.2em] text-paper-50/60">
-            Kec. {siteConfig.kecamatan} · Kab. {siteConfig.kabupaten} ·{" "}
-            {siteConfig.provinsi}
+          <p className="mt-4 text-sm uppercase tracking-wide text-paper-50/60">
+            Kecamatan {siteConfig.kecamatan} · Kabupaten {siteConfig.kabupaten}{" "}
+            · {siteConfig.provinsi}
           </p>
 
           <p className="mt-6 max-w-xl text-lg text-paper-50/80">
@@ -75,13 +68,13 @@ export default function Home() {
           <div className="mt-9 flex flex-wrap gap-3">
             <Link
               href="/profil-desa"
-              className="rounded-full bg-paper-50 px-6 py-3 text-sm font-semibold text-moss-900 transition-colors hover:bg-spring-400"
+              className="rounded-md bg-paper-50 px-6 py-3 text-sm font-semibold text-moss-900 transition-colors hover:bg-white"
             >
               Profil Desa
             </Link>
             <Link
               href="/peta-desa"
-              className="rounded-full border border-paper-50/40 px-6 py-3 text-sm font-semibold text-paper-50 transition-colors hover:border-paper-50 hover:bg-white/5"
+              className="rounded-md border border-paper-50/40 px-6 py-3 text-sm font-semibold text-paper-50 transition-colors hover:border-paper-50 hover:bg-white/5"
             >
               Lihat Peta Desa
             </Link>
@@ -89,38 +82,33 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Sambutan Kepala Desa — kartu ID/lanyard sebagai elemen khas halaman */}
+      {/* Sambutan Kepala Desa */}
       <section className="bg-paper-50">
-        <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 py-20 sm:px-6 md:grid-cols-[260px_1fr] md:items-center">
-          <div className="relative mx-auto md:mx-0">
-            <div className="absolute left-1/2 top-0 h-9 w-3 -translate-x-1/2 -translate-y-8 rounded-full bg-gradient-to-b from-transparent to-moss-500" />
-            <div className="relative -rotate-3 rounded-[28px] border border-moss-900/10 bg-paper-100 p-6 shadow-xl shadow-moss-900/10">
-              <div className="absolute -top-3 left-1/2 h-6 w-6 -translate-x-1/2 rounded-full border-4 border-paper-50 bg-moss-600" />
-              <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.25em] text-moss-600">
-                Sambutan
-              </p>
-              <p className="mt-1 font-display text-2xl font-semibold text-ink-900">
-                Kepala Desa
-              </p>
-              <div className="my-4 h-px bg-moss-900/10" />
-              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-ink-900/50">
-                Desa Pranggong
-              </p>
-            </div>
+        <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-20 sm:px-6 md:grid-cols-[220px_1fr] md:items-start">
+          <div className="mx-auto flex h-56 w-44 items-center justify-center border border-moss-900/15 bg-paper-100 text-ink-900/30 md:mx-0">
+            <svg
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+              className="h-16 w-16"
+            >
+              <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.42 0-8 2.24-8 5v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-2.76-3.58-5-8-5Z" />
+            </svg>
           </div>
 
           <div>
-            <h2 className="font-display text-3xl font-semibold text-ink-900">
-              Sambutan Kepala Desa
+            <Eyebrow>Sambutan Kepala Desa</Eyebrow>
+            <h2 className="mt-3 font-display text-2xl font-semibold text-ink-900 sm:text-3xl">
+              Kepala Desa Pranggong
             </h2>
-            <p className="mt-4 max-w-xl text-lg leading-relaxed text-ink-900/70">
-              &ldquo;Selamat datang di website resmi Desa Pranggong. Melalui
-              website ini, kami berharap dapat menjangkau lebih banyak warga
-              maupun masyarakat umum dengan informasi yang transparan dan
-              mudah diakses — mulai dari profil desa, program kerja, hingga
-              layanan administrasi.&rdquo;
-            </p>
-            <p className="mt-4 text-sm font-medium text-moss-600">
+            <blockquote className="mt-5 max-w-xl border-l-2 border-gold-600 pl-5 text-lg leading-relaxed text-ink-900/80">
+              Selamat datang di website resmi Desa Pranggong. Melalui website
+              ini, kami berharap dapat menjangkau lebih banyak warga maupun
+              masyarakat umum dengan informasi yang transparan dan mudah
+              diakses — mulai dari profil desa, program kerja, hingga layanan
+              administrasi.
+            </blockquote>
+            <p className="mt-4 text-sm font-semibold text-ink-900/60">
               — Kepala Desa Pranggong
             </p>
           </div>
@@ -130,24 +118,17 @@ export default function Home() {
       {/* Program Kerja */}
       <section className="bg-moss-900 text-paper-50">
         <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-[0.25em] text-spring-400">
-                Program Kerja
-              </p>
-              <h2 className="mt-2 font-display text-3xl font-semibold">
-                Untuk Warga Pranggong
-              </h2>
-            </div>
-            <BurstMark className="h-8 w-8 shrink-0 text-spring-400/70" />
-          </div>
+          <Eyebrow onDark>Program Kerja</Eyebrow>
+          <h2 className="mt-3 font-display text-3xl font-semibold">
+            Untuk Warga Pranggong
+          </h2>
 
           <div className="mt-10 grid gap-6 sm:grid-cols-2">
             {programs.map((program) => (
               <Link
                 key={program.href}
                 href={program.href}
-                className="group rounded-2xl border border-paper-50/10 bg-white/5 p-7 transition-colors hover:bg-white/10"
+                className="group border border-paper-50/15 bg-white/5 p-7 transition-colors hover:border-gold-300/60 hover:bg-white/10"
               >
                 <h3 className="font-display text-xl font-semibold text-paper-50">
                   {program.title}
@@ -155,7 +136,7 @@ export default function Home() {
                 <p className="mt-3 text-sm leading-relaxed text-paper-50/70">
                   {program.description}
                 </p>
-                <span className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-spring-400">
+                <span className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-gold-300">
                   Selengkapnya
                   <span className="transition-transform group-hover:translate-x-1">
                     →
@@ -167,44 +148,67 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Berita & Kegiatan */}
-      <section className="bg-paper-50">
+      {/* Pengumuman */}
+      <section className="bg-paper-100">
         <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.25em] text-moss-600">
-                Kabar Desa
-              </p>
-              <h2 className="mt-2 font-display text-3xl font-semibold text-ink-900">
-                Berita &amp; Kegiatan Terbaru
+              <Eyebrow>Layanan Informasi</Eyebrow>
+              <h2 className="mt-3 font-display text-3xl font-semibold text-ink-900">
+                Pengumuman
               </h2>
             </div>
             <Link
               href="/blog"
-              className="text-sm font-medium text-moss-600 hover:text-moss-900 hover:underline"
+              className="text-sm font-semibold text-moss-600 hover:text-moss-900 hover:underline"
             >
               Lihat semua
             </Link>
           </div>
 
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {highlightPosts.map((post) => (
-              <article
-                key={post.title}
-                className="rounded-2xl border border-moss-900/10 p-7"
-              >
-                <p className="font-mono text-xs uppercase tracking-wide text-ink-900/40">
-                  {post.date}
-                </p>
-                <h3 className="mt-3 font-display text-lg font-semibold text-ink-900">
-                  {post.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-900/70">
-                  {post.excerpt}
-                </p>
-              </article>
-            ))}
+          {pengumuman.length > 0 ? (
+            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {pengumuman.map((post) => (
+                <PostCard key={post.slug} post={post} />
+              ))}
+            </div>
+          ) : (
+            <p className="mt-8 text-sm text-ink-900/50">
+              Belum ada pengumuman saat ini.
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* Berita */}
+      <section className="bg-paper-50">
+        <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <Eyebrow>Kabar Desa</Eyebrow>
+              <h2 className="mt-3 font-display text-3xl font-semibold text-ink-900">
+                Berita &amp; Kegiatan Terbaru
+              </h2>
+            </div>
+            <Link
+              href="/blog"
+              className="text-sm font-semibold text-moss-600 hover:text-moss-900 hover:underline"
+            >
+              Lihat semua
+            </Link>
           </div>
+
+          {berita.length > 0 ? (
+            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {berita.map((post) => (
+                <PostCard key={post.slug} post={post} />
+              ))}
+            </div>
+          ) : (
+            <p className="mt-8 text-sm text-ink-900/50">
+              Belum ada berita saat ini.
+            </p>
+          )}
         </div>
       </section>
     </div>

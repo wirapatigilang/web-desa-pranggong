@@ -10,17 +10,35 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-moss-900/10 bg-paper-50/90 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-moss-900/10 bg-paper-50/95 backdrop-blur">
+      <div className="flex h-1 w-full" aria-hidden="true">
+        <span className="flex-1 bg-merah-600" />
+        <span className="flex-1 bg-white" />
+        <span className="flex-1 bg-moss-600" />
+      </div>
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2 font-display font-semibold text-ink-900"
+          className="flex items-center gap-3"
           onClick={() => setOpen(false)}
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-moss-600 text-sm text-paper-50">
+          <span
+            className="flex h-9 w-9 shrink-0 items-center justify-center bg-moss-600 text-sm font-semibold text-paper-50"
+            style={{
+              clipPath:
+                "polygon(50% 0%, 100% 20%, 100% 65%, 50% 100%, 0% 65%, 0% 20%)",
+            }}
+          >
             DP
           </span>
-          <span className="text-lg leading-tight">{siteConfig.name}</span>
+          <span className="leading-tight">
+            <span className="block font-display text-lg font-semibold text-ink-900">
+              {siteConfig.name}
+            </span>
+            <span className="block text-[11px] uppercase tracking-wide text-ink-900/60">
+              Pemerintah Desa · Kec. {siteConfig.kecamatan}
+            </span>
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
@@ -33,7 +51,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`rounded-full px-3 py-2 text-sm font-medium transition-colors ${
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                   active
                     ? "bg-moss-600 text-paper-50"
                     : "text-ink-900 hover:bg-moss-600/10"

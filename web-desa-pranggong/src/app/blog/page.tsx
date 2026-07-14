@@ -1,16 +1,32 @@
 import type { Metadata } from "next";
-import PagePlaceholder from "@/components/ui/page-placeholder";
+import Eyebrow from "@/components/ui/eyebrow";
+import PostList from "@/components/blog/post-list";
 
 export const metadata: Metadata = {
-  title: "Blog",
+  title: "Berita & Pengumuman",
+  description: "Pengumuman resmi dan berita kegiatan terbaru Desa Pranggong.",
 };
 
 export default function BlogPage() {
   return (
-    <PagePlaceholder
-      title="Blog Desa"
-      description="Berita dan kegiatan terbaru seputar Desa Pranggong."
-      note="Sistem CRUD blog (create, read, update, delete) akan dibangun pada Tahap 5 (monodisiplin)."
-    />
+    <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <Eyebrow>Kabar Desa</Eyebrow>
+      <h1 className="mt-3 font-display text-3xl font-semibold text-ink-900 sm:text-4xl">
+        Berita &amp; Pengumuman
+      </h1>
+      <p className="mt-3 max-w-2xl text-ink-900/70">
+        Pengumuman resmi dan berita kegiatan Desa Pranggong dalam satu kanal.
+        Saring berdasarkan kategori di bawah.
+      </p>
+
+      <div className="mt-8">
+        <PostList />
+      </div>
+
+      <p className="mt-10 text-xs text-ink-900/50">
+        Halaman ini masih menampilkan data contoh. Sistem CRUD penuh (tambah,
+        edit, hapus konten oleh admin desa) akan dibangun pada Tahap 5.
+      </p>
+    </div>
   );
 }

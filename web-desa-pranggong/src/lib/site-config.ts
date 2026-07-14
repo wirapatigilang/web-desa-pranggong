@@ -13,7 +13,7 @@ export const navLinks = [
   { label: "Profil Desa", href: "/profil-desa" },
   { label: "Peta Desa", href: "/peta-desa" },
   { label: "Rocket Stove", href: "/program-kerja/rocket-stove" },
-  { label: "Blog", href: "/blog" },
+  { label: "Berita", href: "/blog" },
   { label: "Kontak", href: "/kontak" },
 ];
 

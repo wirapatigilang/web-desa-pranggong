@@ -33,22 +33,24 @@ Ditambah fitur-fitur dasar profil desa agar website layak disebut "website desa"
 
 ### 4.1 Multidisiplin 1 — Peta Interaktif Desa
 
-- [ ] Peta interaktif desa (menggunakan library seperti Leaflet / Mapbox / Google Maps Embed)
-- [ ] Pinpoint/marker untuk lokasi-lokasi penting, minimal:
-  - [ ] Kantor Balai Desa
-  - [ ] Fasilitas kesehatan (Posyandu/Puskesmas Pembantu)
-  - [ ] Fasilitas pendidikan (SD/TK/PAUD)
-  - [ ] Tempat ibadah
-  - [ ] Lokasi UMKM/produk unggulan desa (opsional)
-  - [ ] Titik lokasi proker Rocket Stove (opsional, menghubungkan ke fitur multidisiplin 2)
-- [ ] Popup/info window saat pinpoint diklik, menampilkan:
-  - [ ] Nama lokasi
-  - [ ] Deskripsi singkat
-  - [ ] Nomor kontak / narahubung
-  - [ ] Jam operasional (jika relevan)
-- [ ] Data pinpoint disimpan terstruktur (JSON/database) agar mudah ditambah/diedit tanpa mengubah kode
-- [ ] Kontrol zoom & pan pada peta
-- [ ] Responsif di perangkat mobile
+- [x] Peta interaktif desa (Leaflet + react-leaflet)
+- [x] Pinpoint/marker untuk lokasi-lokasi penting, minimal:
+  - [x] Kantor Balai Desa
+  - [x] Fasilitas kesehatan (Posyandu/Puskesmas Pembantu)
+  - [x] Fasilitas pendidikan (SD/TK/PAUD)
+  - [x] Tempat ibadah
+  - [x] Lokasi UMKM/produk unggulan desa (opsional) — 2 titik placeholder, plus daftar UMKM di `/peta-desa`
+  - [x] Titik lokasi proker Rocket Stove (opsional, menghubungkan ke fitur multidisiplin 2) — popup ada tautan balik
+- [x] Popup/info window saat pinpoint diklik, menampilkan:
+  - [x] Nama lokasi
+  - [x] Deskripsi singkat
+  - [x] Nomor kontak / narahubung
+  - [x] Jam operasional (jika relevan)
+- [x] Data pinpoint disimpan terstruktur (JSON) — `src/lib/village-locations.ts`
+- [x] Kontrol zoom & pan pada peta (bawaan Leaflet) + pencarian & filter kategori (2026-07-15)
+- [x] Responsif di perangkat mobile
+
+*(Catatan: semua koordinat masih placeholder, belum hasil survey GPS — lihat §8)*
 
 ### 4.2 Multidisiplin 2 — Halaman Proker Rocket Stove
 
@@ -64,35 +66,37 @@ Ditambah fitur-fitur dasar profil desa agar website layak disebut "website desa"
 
 ### 4.3 Monodisiplin — Sistem CRUD Blog Desa
 
+> Keputusan (2026-07-15): "Blog" digabung jadi satu model **Pengumuman & Berita** (field `type`), bukan dua fitur terpisah — lihat `src/lib/posts.ts` dan PROGRESS.md.
+
 - [ ] **Create** — form tambah postingan (judul, konten, gambar cover, kategori, tanggal)
 - [ ] **Read**
-  - [ ] Halaman daftar/listing blog dengan pagination
+  - [x] Halaman daftar/listing blog — **data statis**, belum pagination (belum perlu, isi masih 2 post contoh)
   - [ ] Halaman detail per-postingan
-  - [ ] Pencarian/filter berdasarkan kategori atau kata kunci
+  - [x] Pencarian/filter berdasarkan kategori (tipe Pengumuman/Berita) — filter kata kunci bebas belum ada
 - [ ] **Update** — form edit postingan yang sudah ada
 - [ ] **Delete** — hapus postingan (dengan konfirmasi)
 - [ ] Autentikasi admin sederhana (login) agar hanya perangkat desa yang bisa CRUD
-- [ ] Penyimpanan data (database — mis. SQLite/PostgreSQL, atau headless CMS)
+- [ ] Penyimpanan data (database — **Postgres + Prisma**, sudah ditetapkan di `CLAUDE.md` § Stack)
 - [ ] Upload gambar untuk cover/isi artikel
 - [ ] Validasi input form (judul & konten wajib diisi, dll.)
 
 ### 4.4 Fitur Dasar Website Desa (Pelengkap)
 
-- [ ] **Beranda (Homepage)**
-  - [ ] Hero section / banner desa
-  - [ ] Ringkasan sambutan Kepala Desa
-  - [ ] Highlight berita/blog terbaru
-  - [ ] Highlight program kerja KKN
-- [ ] **Profil Desa**
-  - [ ] Sejarah desa
-  - [ ] Visi & misi
-  - [ ] Struktur organisasi pemerintahan desa
-  - [ ] Data geografis & demografis (jumlah penduduk, luas wilayah, batas wilayah)
+- [x] **Beranda (Homepage)**
+  - [x] Hero section / banner desa
+  - [x] Ringkasan sambutan Kepala Desa
+  - [x] Highlight berita/blog terbaru
+  - [x] Highlight program kerja KKN
+- [x] **Profil Desa** *(struktur & layout selesai, isi konten masih placeholder — lihat `src/lib/village-profile.ts`)*
+  - [x] Sejarah desa
+  - [x] Visi & misi
+  - [x] Struktur organisasi pemerintahan desa
+  - [x] Data geografis & demografis (jumlah penduduk, luas wilayah, batas wilayah)
 - [ ] **Layanan Publik / Informasi**
   - [ ] Alur pengurusan surat/administrasi desa
   - [ ] Jadwal pelayanan kantor desa
 - [ ] **Potensi Desa**
-  - [ ] UMKM/produk unggulan
+  - [x] UMKM/produk unggulan — ditampilkan di `/peta-desa` (pinpoint + daftar kartu), data masih placeholder
   - [ ] Potensi wisata (jika ada)
 - [ ] **Galeri** — foto/video kegiatan desa secara umum
 - [ ] **Kontak & Sosial Media**
@@ -128,8 +132,8 @@ Ditambah fitur-fitur dasar profil desa agar website layak disebut "website desa"
 ## 7. Milestone / Tahapan Pengerjaan
 
 - [x] **Tahap 1** — Setup project, layout dasar, navigasi, homepage
-- [ ] **Tahap 2** — Peta interaktif + data pinpoint kontak *(diurutkan lebih dulu dari rencana awal — lihat PROGRESS.md 2026-07-14)*
-- [ ] **Tahap 3** — Halaman profil desa & fitur dasar lainnya
+- [x] **Tahap 2** — Peta interaktif + data pinpoint kontak *(diurutkan lebih dulu dari rencana awal — lihat PROGRESS.md 2026-07-14; koordinat masih placeholder)*
+- [x] **Tahap 3** — Halaman profil desa *(sejarah/visi-misi/struktur/data wilayah selesai, isi masih placeholder; layanan publik/potensi desa/galeri belum)*
 - [ ] **Tahap 4** — Halaman Rocket Stove
 - [ ] **Tahap 5** — Sistem CRUD blog + autentikasi admin
 - [ ] **Tahap 6** — Testing, responsivitas, deploy, serah terima ke perangkat desa

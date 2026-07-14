@@ -3,16 +3,17 @@
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import Link from "next/link";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import { useEffect, useRef } from "react";
+import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import {
   categoryColors,
   categoryLabels,
   mapCenter,
-  villageLocations,
   type LocationCategory,
+  type VillageLocation,
 } from "@/lib/village-locations";
 
-// Ikon default leaflet dihost sendiri di /public/leaflet agar tidak bergantung CDN eksternal.
+// Pinpoint pakai divIcon berwarna per kategori (bukan marker PNG default) agar selaras identitas visual.
 function markerIcon(category: LocationCategory) {
   const color = categoryColors[category];
   return L.divIcon({
@@ -32,9 +33,40 @@ function markerIcon(category: LocationCategory) {
   });
 }
 
-export default function VillageMap() {
+// Terbang ke lokasi terpilih (dari pencarian/daftar) dan buka popup-nya.
+function MapController({
+  focusId,
+  locations,
+  markerRefs,
+}: {
+  focusId: string | null;
+  locations: VillageLocation[];
+  markerRefs: React.RefObject<Record<string, L.Marker | null>>;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!focusId) return;
+    const location = locations.find((item) => item.id === focusId);
+    if (!location) return;
+    map.flyTo([location.lat, location.lng], 17, { duration: 0.75 });
+    markerRefs.current[focusId]?.openPopup();
+  }, [focusId, locations, map, markerRefs]);
+
+  return null;
+}
+
+export default function VillageMap({
+  locations,
+  focusId,
+}: {
+  locations: VillageLocation[];
+  focusId: string | null;
+}) {
+  const markerRefs = useRef<Record<string, L.Marker | null>>({});
+
   return (
-    <div className="overflow-hidden rounded-2xl border border-moss-900/10 shadow-sm">
+    <div className="relative isolate z-0 overflow-hidden border border-moss-900/10 shadow-sm">
       <MapContainer
         center={mapCenter}
         zoom={15}
@@ -45,14 +77,22 @@ export default function VillageMap() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {villageLocations.map((location) => (
+        <MapController
+          focusId={focusId}
+          locations={locations}
+          markerRefs={markerRefs}
+        />
+        {locations.map((location) => (
           <Marker
             key={location.id}
             position={[location.lat, location.lng]}
             icon={markerIcon(location.category)}
+            ref={(instance) => {
+              markerRefs.current[location.id] = instance;
+            }}
           >
             <Popup>
-              <p className="font-mono text-[10px] uppercase tracking-wide text-moss-600">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-gold-600">
                 {categoryLabels[location.category]}
               </p>
               <p className="mt-1 font-semibold text-ink-900">{location.name}</p>
