@@ -11,9 +11,9 @@
 - **Urutan tahap diubah atas permintaan user (2026-07-14)**: peta interaktif dimajukan jadi **Tahap 2**, profil desa mundur jadi **Tahap 3** (lihat log di bawah & `requirement.md` §7).
 - Tahap 2 (peta interaktif): prototype ada di `/peta-desa`, belum final (koordinat placeholder).
 - Tahap 3 — Profil Desa: `/profil-desa` sudah diisi (sejarah, visi-misi, data geografis/demografis, struktur organisasi), **semua isinya masih placeholder eksplisit** (belum data resmi dari perangkat desa — lihat `src/lib/village-profile.ts`). Sisa: layanan publik, potensi wisata, galeri.
-- **Tahap 4 (Rocket Stove) masih di-skip** — belum dikerjakan.
+- **Tahap 4 (Rocket Stove) — SELESAI (struktur & teks)**: `/program-kerja/rocket-stove` sudah diisi penuh. Foto dokumentasi masih `ImagePlaceholder` (belum ada foto asli dari tim KKN).
 - **Tahap 5 — SELESAI (inti)**: CRUD Berita/Pengumuman + auth admin + database sudah jalan. Detail lengkap di log 2026-07-15 "Tahap 5". Sisa: form upload gambar cover (belum ada), pagination (belum perlu, data masih sedikit).
-- Tahap berikutnya: Rocket Stove (Tahap 4) yang sempat di-skip, ATAU sisa Tahap 3 (layanan publik/potensi wisata/galeri), ATAU poles Tahap 5 (upload gambar) — tunggu arahan user.
+- Tahap berikutnya: sisa Tahap 3 (layanan publik/potensi wisata/galeri), ATAU poles Tahap 5 (upload gambar), ATAU isi foto asli Rocket Stove menggantikan placeholder — tunggu arahan user.
 - **PENTING sebelum deploy**: ganti `ADMIN_EMAIL`/`ADMIN_PASSWORD` di `.env` (masih nilai contoh) dan `BETTER_AUTH_SECRET`, lalu jalankan `prisma db seed` di environment produksi. Tidak ada form pendaftaran publik by design — akun admin cuma bisa dibuat lewat seed script.
 
 ## Arsitektur / Konvensi Project
@@ -36,7 +36,7 @@
 | `/` | Selesai — homepage (hero, sambutan, highlight program kerja, highlight blog) |
 | `/profil-desa` | Selesai (Tahap 3) — sejarah, visi-misi, data wilayah, struktur organisasi; isi konten masih placeholder |
 | `/peta-desa` | Prototype Tahap 2 — peta interaktif Leaflet aktif, koordinat masih placeholder |
-| `/program-kerja/rocket-stove` | Stub placeholder — konten di Tahap 4 (multidisiplin 2) |
+| `/program-kerja/rocket-stove` | Selesai (Tahap 4) — teks lengkap, foto masih placeholder |
 | `/blog` | Selesai — "Berita & Pengumuman" dari database, filter tipe |
 | `/kontak` | Selesai — menampilkan data dari `contactInfo` |
 | `/admin/login` | Selesai — form login (Better Auth email/password) |
@@ -44,6 +44,22 @@
 | `/admin/posts/new`, `/admin/posts/[id]/edit` | Selesai — form create/edit (shadcn) |
 
 ## Log Pengerjaan
+
+### 2026-07-16 — Tahap 4: Halaman Rocket Stove
+- Diminta lanjut Tahap 4 yang sempat di-skip, dengan placeholder untuk gambar (belum ada foto dokumentasi asli dari tim KKN).
+- Komponen baru `src/components/ui/image-placeholder.tsx` — kotak bordered-dashed + ikon gambar + label, reusable (dipakai 8× di halaman ini, bisa dipakai lagi nanti untuk galeri desa umum di sisa Tahap 3).
+- `src/app/(site)/program-kerja/rocket-stove/page.tsx` diisi penuh sesuai checklist requirement.md §4.2: penjelasan konsep, latar belakang & tujuan (3 kartu manfaat), dokumentasi proses pembuatan (3 slot placeholder), spesifikasi teknis (band gelap `moss-900` + diagram placeholder + `dl` spek — field bahan/dimensi spesifik sengaja ditandai "Menyusul — dokumentasi tim KKN", BUKAN dikarang, karena angka spesifik untuk proyek fisik desa sungguhan tidak boleh direka), dokumentasi sosialisasi (2 slot), galeri sebelum-sesudah (2 slot), kontak narahubung (pakai `contactInfo.phone` yang sudah ada), dan tombol tautan balik ke `/peta-desa` (integrasi §4.1 — pinpoint "Titik Demo Rocket Stove" di peta sudah link ke halaman ini sejak sesi peta interaktif, sekarang dua arah).
+- Konsep teknis umum Rocket Stove (ruang bakar L-shaped, prinsip isolasi panas) ditulis sebagai penjelasan generik yang memang benar secara umum — bukan spesifik ke build Pranggong — beda dengan angka/bahan spesifik yang di-placeholder.
+- Verifikasi: `npm run lint` bersih, `npm run build` sukses (12 route), smoke-test curl `/program-kerja/rocket-stove` → 200, konten section-section utama muncul di HTML.
+- **Belum dikerjakan**: foto dokumentasi asli (nunggu tim KKN), bahan/dimensi spesifik tungku.
+
+### 2026-07-16 — Fix: login admin gagal setelah pindah Neon → local lagi
+- User sempat coba pindah database ke Neon (cloud Postgres), lalu balik lagi ke Postgres lokal. Setelah pindah balik, login admin gagal total.
+- **Akar masalah**: saat eksperimen Neon, `src/lib/prisma.ts` diedit supaya adapter pakai `process.env.DIRECT_URL` (pola umum Neon: `DATABASE_URL` buat pooled connection, `DIRECT_URL` buat direct connection). Waktu pindah balik ke lokal, baris `DATABASE_URL`/`DIRECT_URL` Neon di `.env` di-comment dan `DATABASE_URL` lokal diaktifkan lagi — **tapi `prisma.ts` lupa dikembalikan ke `DATABASE_URL`**. Karena `DIRECT_URL` sekarang tidak ter-set sama sekali, Prisma Client konek dengan `connectionString: undefined`, jadi semua query (termasuk cek sesi login) gagal.
+- Fix: `src/lib/prisma.ts` — `process.env.DIRECT_URL` → `process.env.DATABASE_URL`. Dicek juga `prisma.config.ts` (dipakai CLI migrate/seed) — itu sudah benar dari awal, cuma `prisma.ts` (dipakai runtime app) yang kena.
+- **Gotcha tambahan yang bikin ini lebih membingungkan**: `prisma` di `src/lib/prisma.ts` di-cache lewat `globalThis` (pola standar Next.js dev supaya koneksi tidak dibuat ulang tiap Fast Refresh). Konsekuensinya: **edit kode di `prisma.ts` saja TIDAK cukup** — instance lama (dengan connection string salah) tetap nyangkut di `globalThis` sampai proses `next dev` di-restart total. Kalau lain kali ganti `DATABASE_URL`/`DIRECT_URL` di `.env` dan aplikasi masih "connect ke DB lama", restart dev server dulu sebelum curiga ke tempat lain.
+- **Pelajaran untuk ke depan**: kalau mau eksperimen provider database lain (Neon/Supabase/dll), jangan ubah nama env var yang dibaca `prisma.ts` — cukup ganti VALUE `DATABASE_URL` di `.env`, biar gampang balik lagi tanpa harus ingat-ingat file mana yang perlu direvert.
+- Verifikasi: sign-in via `POST /api/auth/sign-in/email` dengan kredensial seed → 200 + token, `/admin` dengan cookie sesi → 200.
 
 ### 2026-07-15 — Tahap 5: Dashboard admin (auth + database + CRUD), shadcn light theme
 User minta eksplisit: "dashboard admin, auth + DB, Better Auth, UI shadcn light theme". Ini perubahan besar, banyak keputusan teknis non-obvious — dibaca pelan-pelan sebelum utak-atik bagian ini.

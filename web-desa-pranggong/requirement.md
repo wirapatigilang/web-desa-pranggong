@@ -54,15 +54,17 @@ Ditambah fitur-fitur dasar profil desa agar website layak disebut "website desa"
 
 ### 4.2 Multidisiplin 2 — Halaman Proker Rocket Stove
 
-- [ ] Halaman tersendiri (route khusus, mis. `/program-kerja/rocket-stove`)
-- [ ] Penjelasan apa itu Rocket Stove
-- [ ] Latar belakang & tujuan program (manfaat efisiensi bahan bakar, pengurangan asap, dll.)
-- [ ] Dokumentasi proses pembuatan/instalasi (foto/gambar)
-- [ ] Spesifikasi/desain teknis Rocket Stove yang dibuat (opsional: diagram atau ukuran)
-- [ ] Dokumentasi kegiatan sosialisasi/pelatihan ke warga (jika ada)
-- [ ] Galeri foto sebelum-sesudah / hasil uji coba
-- [ ] Kontak/narahubung untuk warga yang tertarik membuat Rocket Stove sendiri
-- [ ] Tautan kembali ke pinpoint lokasi di peta interaktif (integrasi dengan 4.1)
+> Status (2026-07-16): struktur & konten teks selesai. Foto dokumentasi asli BELUM ada — semua slot gambar memakai `ImagePlaceholder` (lihat PROGRESS.md).
+
+- [x] Halaman tersendiri (route khusus `/program-kerja/rocket-stove`)
+- [x] Penjelasan apa itu Rocket Stove
+- [x] Latar belakang & tujuan program (manfaat efisiensi bahan bakar, pengurangan asap, dll.)
+- [x] Dokumentasi proses pembuatan/instalasi (foto/gambar) — **placeholder**, foto asli menyusul
+- [x] Spesifikasi/desain teknis Rocket Stove yang dibuat — bentuk ruang bakar (L-shaped) dijelaskan; bahan/dimensi spesifik masih placeholder (belum ada data dari tim KKN)
+- [x] Dokumentasi kegiatan sosialisasi/pelatihan ke warga — **placeholder**, foto asli menyusul
+- [x] Galeri foto sebelum-sesudah / hasil uji coba — **placeholder**, foto asli menyusul
+- [x] Kontak/narahubung untuk warga yang tertarik membuat Rocket Stove sendiri (pakai `contactInfo.phone`)
+- [x] Tautan kembali ke pinpoint lokasi di peta interaktif (integrasi dengan 4.1) — tombol ke `/peta-desa`
 
 ### 4.3 Monodisiplin — Sistem CRUD Blog Desa
 
@@ -134,7 +136,7 @@ Ditambah fitur-fitur dasar profil desa agar website layak disebut "website desa"
 - [x] **Tahap 1** — Setup project, layout dasar, navigasi, homepage
 - [x] **Tahap 2** — Peta interaktif + data pinpoint kontak *(diurutkan lebih dulu dari rencana awal — lihat PROGRESS.md 2026-07-14; koordinat masih placeholder)*
 - [x] **Tahap 3** — Halaman profil desa *(sejarah/visi-misi/struktur/data wilayah selesai, isi masih placeholder; layanan publik/potensi desa/galeri belum)*
-- [ ] **Tahap 4** — Halaman Rocket Stove
+- [x] **Tahap 4** — Halaman Rocket Stove *(struktur & teks selesai 2026-07-16; foto dokumentasi masih placeholder)*
 - [x] **Tahap 5** — Sistem CRUD blog + autentikasi admin *(inti selesai 2026-07-15: Better Auth + Prisma/Postgres + dashboard shadcn; sisa: upload gambar cover, halaman detail per-post)*
 - [ ] **Tahap 6** — Testing, responsivitas, deploy, serah terima ke perangkat desa
 
