@@ -116,10 +116,44 @@ async function seedVillageProfile() {
   console.log("Profil desa awal disiapkan.");
 }
 
+// Migrasi 2 UMKM yang sebelumnya statis di src/lib/village-locations.ts ke database.
+async function seedUmkm() {
+  const initialUmkm = [
+    {
+      name: "UMKM Warga #1",
+      description:
+        "Nama usaha dan produk unggulan menyusul data resmi dari perangkat desa.",
+      contact: "0812-xxxx-xxxx",
+      lat: -7.362,
+      lng: 110.7545,
+    },
+    {
+      name: "UMKM Warga #2",
+      description:
+        "Nama usaha dan produk unggulan menyusul data resmi dari perangkat desa.",
+      contact: "0812-xxxx-xxxx",
+      lat: -7.3598,
+      lng: 110.7567,
+    },
+  ];
+
+  for (const umkm of initialUmkm) {
+    const existing = await prisma.umkm.findFirst({
+      where: { name: umkm.name },
+    });
+    if (!existing) {
+      await prisma.umkm.create({ data: umkm });
+    }
+  }
+
+  console.log(`UMKM awal disiapkan: ${initialUmkm.length}`);
+}
+
 Promise.resolve()
   .then(main)
   .then(seedPosts)
   .then(seedVillageProfile)
+  .then(seedUmkm)
   .catch((error) => {
     console.error(error);
     process.exitCode = 1;

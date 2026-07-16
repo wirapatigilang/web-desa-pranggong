@@ -39,7 +39,7 @@ Ditambah fitur-fitur dasar profil desa agar website layak disebut "website desa"
   - [x] Fasilitas kesehatan (Posyandu/Puskesmas Pembantu)
   - [x] Fasilitas pendidikan (SD/TK/PAUD)
   - [x] Tempat ibadah
-  - [x] Lokasi UMKM/produk unggulan desa (opsional) — 2 titik placeholder, plus daftar UMKM di `/peta-desa`
+  - [x] Lokasi UMKM/produk unggulan desa (opsional) — dari database, diinput admin lewat `/admin/umkm` (2026-07-16); titik lokasi di peta opsional per-UMKM
   - [x] Titik lokasi proker Rocket Stove (opsional, menghubungkan ke fitur multidisiplin 2) — popup ada tautan balik
 - [x] Popup/info window saat pinpoint diklik, menampilkan:
   - [x] Nama lokasi
@@ -98,7 +98,7 @@ Ditambah fitur-fitur dasar profil desa agar website layak disebut "website desa"
   - [ ] Alur pengurusan surat/administrasi desa
   - [ ] Jadwal pelayanan kantor desa
 - [ ] **Potensi Desa**
-  - [x] UMKM/produk unggulan — ditampilkan di `/peta-desa` (pinpoint + daftar kartu), data masih placeholder
+  - [x] UMKM/produk unggulan — ditampilkan di `/peta-desa` (pinpoint + daftar kartu), CRUD penuh lewat `/admin/umkm` (2026-07-16); isi datanya masih 2 contoh placeholder sampai admin input data asli
   - [ ] Potensi wisata (jika ada)
 - [ ] **Galeri** — foto/video kegiatan desa secara umum
 - [ ] **Kontak & Sosial Media**

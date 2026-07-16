@@ -9,8 +9,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import DeletePostButton from "@/components/admin/delete-post-button";
+import ConfirmDeleteButton from "@/components/admin/confirm-delete-button";
 import { prisma } from "@/lib/prisma";
+import { deletePost } from "@/lib/actions/posts";
 
 export default async function AdminPostsPage() {
   const posts = await prisma.post.findMany({
@@ -64,7 +65,12 @@ export default async function AdminPostsPage() {
                   <Button variant="ghost" size="sm" asChild>
                     <Link href={`/admin/posts/${post.id}/edit`}>Edit</Link>
                   </Button>
-                  <DeletePostButton id={post.id} title={post.title} />
+                  <ConfirmDeleteButton
+                    title={`Hapus "${post.title}"?`}
+                    description="Tindakan ini tidak bisa dibatalkan. Konten akan langsung hilang dari website publik."
+                    successMessage={`"${post.title}" dihapus.`}
+                    onConfirm={deletePost.bind(null, post.id)}
+                  />
                 </TableCell>
               </TableRow>
             ))}

@@ -94,25 +94,6 @@ export const villageLocations: VillageLocation[] = [
     lat: -7.3648,
     lng: 110.7563,
   },
-  // UMKM di bawah ini PLACEHOLDER — nama usaha & produk asli menyusul data dari perangkat desa.
-  {
-    id: "umkm-1",
-    name: "UMKM Warga #1",
-    category: "umkm",
-    description:
-      "Nama usaha dan produk unggulan menyusul data resmi dari perangkat desa.",
-    contact: "0812-xxxx-xxxx",
-    lat: -7.362,
-    lng: 110.7545,
-  },
-  {
-    id: "umkm-2",
-    name: "UMKM Warga #2",
-    category: "umkm",
-    description:
-      "Nama usaha dan produk unggulan menyusul data resmi dari perangkat desa.",
-    contact: "0812-xxxx-xxxx",
-    lat: -7.3598,
-    lng: 110.7567,
-  },
+  // Catatan: titik UMKM TIDAK lagi di sini — sekarang dari database (model `Umkm`,
+  // diinput admin lewat /admin/umkm) dan digabung ke array ini di src/app/(site)/peta-desa/page.tsx.
 ];

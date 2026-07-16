@@ -9,7 +9,7 @@
 - Referensi requirement & checklist lengkap: `requirement.md`
 - Tahap selesai: **Tahap 1 — Setup project, layout dasar, navigasi, homepage**
 - **Urutan tahap diubah atas permintaan user (2026-07-14)**: peta interaktif dimajukan jadi **Tahap 2**, profil desa mundur jadi **Tahap 3** (lihat log di bawah & `requirement.md` §7).
-- Tahap 2 (peta interaktif): prototype ada di `/peta-desa`, belum final (koordinat placeholder).
+- Tahap 2 (peta interaktif): prototype ada di `/peta-desa`, belum final (koordinat placeholder). **Sejak 2026-07-16, titik UMKM di peta ini dari database dan diinput admin lewat `/admin/umkm`** (lokasi non-UMKM lain masih data statis di `src/lib/village-locations.ts`).
 - Tahap 3 — Profil Desa: `/profil-desa` sudah diisi (sejarah, visi-misi, data geografis/demografis, struktur organisasi). **Sejak 2026-07-16, konten ini bisa diedit admin sendiri lewat `/admin/profil`** (database, bukan lagi kode statis) — isinya masih placeholder sampai perangkat desa mengisi lewat dashboard. Sisa checklist §4.4: layanan publik, potensi wisata, galeri.
 - **Tahap 4 (Rocket Stove) — SELESAI (struktur & teks)**: `/program-kerja/rocket-stove` sudah diisi penuh. Foto dokumentasi masih `ImagePlaceholder` (belum ada foto asli dari tim KKN).
 - **Tahap 5 — SELESAI (inti)**: CRUD Berita/Pengumuman + auth admin + database sudah jalan. Detail lengkap di log 2026-07-15 "Tahap 5". Sisa: form upload gambar cover (belum ada), pagination (belum perlu, data masih sedikit).
@@ -30,7 +30,9 @@
 - **Database & Auth**: Prisma 7 (generator baru `prisma-client`, BUKAN `prisma-client-js` lama) + PostgreSQL lokal (`web_desa_pranggong`, dibuat via `createdb`) + Better Auth (email/password saja, TANPA sign-up publik). Detail teknis penting di log 2026-07-15 "Tahap 5" — WAJIB dibaca sebelum utak-atik Prisma/auth, karena konvensinya beda signifikan dari Prisma versi lama yang mungkin diasumsikan agent lain.
 - Data Berita/Pengumuman sekarang dari database (`prisma.post`), BUKAN lagi array statis. `src/lib/posts.ts` cuma nyisa `postTypeLabels` (label tampilan).
 - Data Profil Desa juga dari database (`prisma.villageProfile`, satu baris singleton `id: "singleton"`), diedit lewat `/admin/profil`. `src/lib/village-profile.ts` isinya sekarang fungsi `getVillageProfile()` (async, query DB), BUKAN lagi konstanta statis — kalau import dari situ, ingat itu perlu di-`await`.
-- Helper auth guard `requireSession()` dipusatkan di `src/lib/actions/require-session.ts`, dipakai semua server action admin (`posts.ts`, `profile.ts`). Kalau bikin action admin baru, import dari situ, jangan tulis ulang.
+- Helper auth guard `requireSession()` dipusatkan di `src/lib/actions/require-session.ts`, dipakai semua server action admin (`posts.ts`, `profile.ts`, `umkm.ts`). Kalau bikin action admin baru, import dari situ, jangan tulis ulang.
+- Data UMKM dari database (`prisma.umkm`), diedit lewat `/admin/umkm`. `lat`/`lng` OPSIONAL (nullable) — kalau kosong, UMKM tetap tampil di "Potensi Desa" tapi tidak jadi pinpoint di peta. Halaman `/peta-desa` (server component) yang menggabungkan `villageLocations` statis + UMKM dari DB jadi satu array sebelum dikirim ke `VillageExplorer` — lihat `src/app/(site)/peta-desa/page.tsx`.
+- Tombol hapus admin dipusatkan jadi `src/components/admin/confirm-delete-button.tsx` (generik, dipakai Post & UMKM). **PENTING kalau dipakai dari Server Component**: prop `onConfirm` HARUS diisi server action yang di-`.bind(null, id)`, JANGAN bungkus jadi closure baru (`() => deleteX(id)`) — React/Next.js RSC cuma bisa serialize *server action reference* (termasuk hasil `.bind()`), bukan closure biasa. Lihat log 2026-07-16 "UMKM" di bawah untuk detail bug-nya.
 
 ## Struktur Route (app/)
 
@@ -39,7 +41,8 @@
 | `/` | Selesai — homepage (hero, sambutan, highlight program kerja, highlight blog) |
 | `/profil-desa` | Selesai (Tahap 3) — sejarah, visi-misi, data wilayah, struktur organisasi; konten dari database, bisa diedit admin |
 | `/admin/profil` | Selesai — form edit konten Profil Desa (termasuk repeater struktur organisasi) |
-| `/peta-desa` | Prototype Tahap 2 — peta interaktif Leaflet aktif, koordinat masih placeholder |
+| `/admin/umkm`, `/admin/umkm/new`, `/admin/umkm/[id]/edit` | Selesai — CRUD UMKM (nama, deskripsi, kontak, titik lokasi opsional) |
+| `/peta-desa` | Prototype Tahap 2 — peta interaktif Leaflet aktif; titik UMKM dari database, titik lain masih placeholder |
 | `/program-kerja/rocket-stove` | Selesai (Tahap 4) — teks lengkap, foto masih placeholder |
 | `/blog` | Selesai — "Berita & Pengumuman" dari database, filter tipe |
 | `/kontak` | Selesai — menampilkan data dari `contactInfo` |
@@ -48,6 +51,19 @@
 | `/admin/posts/new`, `/admin/posts/[id]/edit` | Selesai — form create/edit (shadcn) |
 
 ## Log Pengerjaan
+
+### 2026-07-16 — UMKM jadi data database, diinput admin lewat dashboard
+- User minta: data UMKM/produk unggulan yang sebelumnya statis di `src/lib/village-locations.ts` (2 entri placeholder `umkm-1`/`umkm-2`) sekarang harus dari database dan bisa diinput admin sendiri.
+- Model baru `Umkm` di `prisma/schema.prisma`: `name`, `description`, `contact` (opsional), `lat`/`lng` (**opsional, nullable**) — sengaja tidak wajib karena admin belum tentu tahu koordinat GPS usaha warga; kalau kosong, UMKM tetap tampil di daftar "Potensi Desa" tapi tidak muncul sebagai pinpoint di peta. Migrasi `add_umkm` dijalankan, `prisma/seed.ts` ditambah `seedUmkm()` (pakai `findFirst` by nama sebagai pengganti unique constraint, karena ini cuma migrasi data lama satu kali) yang memindahkan 2 UMKM placeholder ke DB.
+- **Gotcha proses**: setelah `prisma migrate dev --name add_umkm`, `prisma.umkm` sempat `undefined` saat seed dijalankan — ternyata `migrate dev` kali ini TIDAK auto-regenerate client (biasanya otomatis). Fix: jalankan `prisma generate` eksplisit sebelum seed. Kalau nambah model baru lagi, jangan asumsikan `migrate dev` selalu auto-generate — cek `src/generated/prisma/models.ts` ada modelnya sebelum lanjut.
+- `src/lib/village-locations.ts`: 2 entri UMKM statis DIHAPUS (sudah pindah ke DB, bukan lagi bagian dari array `villageLocations`).
+- Server actions `src/lib/actions/umkm.ts` — `createUmkm`/`updateUmkm`/`deleteUmkm`, validasi lat/lng: kalau salah satu diisi, dua-duanya wajib diisi (mencegah titik peta setengah-jadi), dan harus berupa angka valid.
+- **Refactor**: tombol hapus (`DeletePostButton`, tadinya khusus post) digeneralisasi jadi `src/components/admin/confirm-delete-button.tsx`, dipakai ulang untuk Post dan UMKM.
+- **Bug yang sempat lolos ke runtime (build sukses, tapi halaman 500 di dev)**: saat pasang `ConfirmDeleteButton` di halaman list (Server Component), awalnya ditulis `onConfirm={() => deletePost(post.id)}` — closure biasa. Ini **tidak error saat `npm run build`** (type-check statis tidak menangkapnya) tapi meledak saat halaman benar-benar dirender: `Error: Event handlers cannot be passed to Client Component props`. Sebabnya: RSC cuma bisa serialize referensi *server action* (fungsi `"use server"`, termasuk hasil `.bind()`) melewati batas Server→Client Component, bukan closure sembarang buatan sendiri — meskipun closure itu di dalamnya memanggil server action. Fix: `onConfirm={deletePost.bind(null, post.id)}` (pola yang sama persis dengan `updatePost.bind(null, id)` yang sudah dipakai di halaman edit post sejak Tahap 5, tapi kelewat diterapkan konsisten saat refactor kali ini). **Pelajaran: `npm run build` sukses TIDAK berarti bebas bug RSC boundary — selalu render halaman beneran (curl/browser) setelah ubah komponen yang dipakai lintas server/client.**
+- Halaman admin: `/admin/umkm` (tabel + status "Ada"/"Belum ada" titik peta), `/admin/umkm/new`, `/admin/umkm/[id]/edit` (form `src/components/admin/umkm-form.tsx` — field lat/lng jadi `<Input type="text" inputMode="decimal">`, bukan `type="number"`, supaya bebas kosongin tanpa validasi browser aneh, divalidasi manual di server action). Link sidebar "UMKM" ditambah di `src/app/admin/(dashboard)/layout.tsx`.
+- Halaman publik `/peta-desa` (`src/app/(site)/peta-desa/page.tsx`, server component): fetch `prisma.umkm.findMany()`, filter yang punya `lat`+`lng`, ubah ke bentuk `VillageLocation` (`id: "umkm-" + id`), gabung dengan `villageLocations` statis, lalu kirim ke `VillageExplorer` sebagai props `locations` + `umkmItems` (raw, termasuk yang tanpa koordinat, buat section showcase). `VillageExplorer` di-refactor total dari "import data statis + derive umkmLocations sendiri" jadi murni terima props — kalau ada UMKM tanpa koordinat, section showcase tetap menampilkannya tapi tombol "Lihat di peta" diganti teks "Belum ada titik lokasi di peta".
+- Verifikasi: `npm run lint` bersih, `npm run build` sukses (15 route). Setelah fix bug RSC di atas: smoke-test curl `/peta-desa` → 200 (UMKM dari DB muncul), login admin → `/admin` 200, `/admin/umkm` 200 (list muncul), `/admin/umkm/[id]/edit` 200 dengan id sungguhan dari DB.
+- **Belum diuji lewat browser sungguhan**: submit form create/edit/delete UMKM beneran (validasi lat/lng, repeater konfirmasi hapus). Kodenya sudah diperbaiki dari bug RSC di atas dan lolos smoke test GET, tapi POST/mutasi belum diklik manual.
 
 ### 2026-07-16 — Profil Desa jadi bisa diedit admin (khusus untuk pergantian perangkat desa)
 - User minta: admin desa bisa edit teks di `/profil-desa` sendiri lewat dashboard, terutama kalau ada pergantian perangkat desa (nama pejabat berubah).

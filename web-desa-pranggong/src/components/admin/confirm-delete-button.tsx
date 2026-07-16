@@ -14,21 +14,24 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deletePost } from "@/lib/actions/posts";
 
-export default function DeletePostButton({
-  id,
+export default function ConfirmDeleteButton({
   title,
+  description,
+  successMessage,
+  onConfirm,
 }: {
-  id: string;
   title: string;
+  description: string;
+  successMessage: string;
+  onConfirm: () => Promise<void>;
 }) {
   const [pending, startTransition] = useTransition();
 
   function handleDelete() {
     startTransition(async () => {
-      await deletePost(id);
-      toast.success(`"${title}" dihapus.`);
+      await onConfirm();
+      toast.success(successMessage);
     });
   }
 
@@ -41,11 +44,8 @@ export default function DeletePostButton({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Hapus &ldquo;{title}&rdquo;?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Tindakan ini tidak bisa dibatalkan. Konten akan langsung hilang
-            dari website publik.
-          </AlertDialogDescription>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Batal</AlertDialogCancel>

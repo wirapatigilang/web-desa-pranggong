@@ -5,14 +5,20 @@ import VillageMapLoader from "@/components/map/village-map-loader";
 import {
   categoryColors,
   categoryLabels,
-  villageLocations,
   type LocationCategory,
   type VillageLocation,
 } from "@/lib/village-locations";
+import type { Umkm } from "@/generated/prisma/client";
 
 const categories = Object.keys(categoryLabels) as LocationCategory[];
 
-export default function VillageExplorer() {
+export default function VillageExplorer({
+  locations,
+  umkmItems,
+}: {
+  locations: VillageLocation[];
+  umkmItems: Umkm[];
+}) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<LocationCategory | "semua">(
     "semua",
@@ -22,7 +28,7 @@ export default function VillageExplorer() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return villageLocations.filter((location) => {
+    return locations.filter((location) => {
       const matchesCategory =
         activeCategory === "semua" || location.category === activeCategory;
       const matchesQuery =
@@ -31,17 +37,12 @@ export default function VillageExplorer() {
         location.description.toLowerCase().includes(q);
       return matchesCategory && matchesQuery;
     });
-  }, [query, activeCategory]);
+  }, [locations, query, activeCategory]);
 
-  const umkmLocations = useMemo(
-    () => villageLocations.filter((location) => location.category === "umkm"),
-    [],
-  );
-
-  function focusLocation(location: VillageLocation) {
+  function focusLocation(locationId: string) {
     setQuery("");
     setActiveCategory("semua");
-    setFocusId(location.id);
+    setFocusId(locationId);
     mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -128,35 +129,45 @@ export default function VillageExplorer() {
           Potensi Desa — UMKM &amp; Produk Unggulan
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-ink-900/60">
-          Daftar usaha warga di Desa Pranggong. Data usaha di bawah masih
-          placeholder, menyusul pendataan resmi dari perangkat desa.
+          Daftar usaha warga di Desa Pranggong, dikelola langsung oleh admin
+          desa.
         </p>
 
         <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {umkmLocations.map((location) => (
-            <div key={location.id} className="border border-moss-900/10 p-5">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gold-600">
-                {categoryLabels.umkm}
-              </p>
-              <h3 className="mt-2 font-display text-lg font-semibold text-ink-900">
-                {location.name}
-              </h3>
-              <p className="mt-2 text-sm text-ink-900/70">{location.description}</p>
-              {location.contact && (
-                <p className="mt-2 text-xs text-ink-900/50">
-                  Kontak: {location.contact}
+          {umkmItems.map((item) => {
+            const mapLocationId = `umkm-${item.id}`;
+            const onMap = locations.some((l) => l.id === mapLocationId);
+            return (
+              <div key={item.id} className="border border-moss-900/10 p-5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gold-600">
+                  {categoryLabels.umkm}
                 </p>
-              )}
-              <button
-                type="button"
-                onClick={() => focusLocation(location)}
-                className="mt-4 text-sm font-semibold text-moss-600 hover:underline"
-              >
-                Lihat di peta ↑
-              </button>
-            </div>
-          ))}
-          {umkmLocations.length === 0 && (
+                <h3 className="mt-2 font-display text-lg font-semibold text-ink-900">
+                  {item.name}
+                </h3>
+                <p className="mt-2 text-sm text-ink-900/70">{item.description}</p>
+                {item.contact && (
+                  <p className="mt-2 text-xs text-ink-900/50">
+                    Kontak: {item.contact}
+                  </p>
+                )}
+                {onMap ? (
+                  <button
+                    type="button"
+                    onClick={() => focusLocation(mapLocationId)}
+                    className="mt-4 text-sm font-semibold text-moss-600 hover:underline"
+                  >
+                    Lihat di peta ↑
+                  </button>
+                ) : (
+                  <p className="mt-4 text-xs italic text-ink-900/40">
+                    Belum ada titik lokasi di peta.
+                  </p>
+                )}
+              </div>
+            );
+          })}
+          {umkmItems.length === 0 && (
             <p className="text-sm text-ink-900/50">Data UMKM belum tersedia.</p>
           )}
         </div>

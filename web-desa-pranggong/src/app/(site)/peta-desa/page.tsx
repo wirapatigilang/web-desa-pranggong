@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Eyebrow from "@/components/ui/eyebrow";
 import VillageExplorer from "@/components/map/village-explorer";
+import { prisma } from "@/lib/prisma";
+import { villageLocations, type VillageLocation } from "@/lib/village-locations";
 
 export const metadata: Metadata = {
   title: "Peta Desa",
@@ -8,7 +10,25 @@ export const metadata: Metadata = {
     "Peta interaktif Desa Pranggong — lokasi kantor desa, fasilitas umum, dan titik program kerja beserta informasi kontaknya.",
 };
 
-export default function PetaDesaPage() {
+export default async function PetaDesaPage() {
+  const umkmItems = await prisma.umkm.findMany({
+    orderBy: { createdAt: "asc" },
+  });
+
+  const umkmLocations: VillageLocation[] = umkmItems
+    .filter((item) => item.lat !== null && item.lng !== null)
+    .map((item) => ({
+      id: `umkm-${item.id}`,
+      name: item.name,
+      category: "umkm",
+      description: item.description,
+      contact: item.contact ?? undefined,
+      lat: item.lat as number,
+      lng: item.lng as number,
+    }));
+
+  const locations = [...villageLocations, ...umkmLocations];
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <Eyebrow>Multidisiplin 1</Eyebrow>
@@ -22,7 +42,7 @@ export default function PetaDesaPage() {
       </p>
 
       <div className="mt-8">
-        <VillageExplorer />
+        <VillageExplorer locations={locations} umkmItems={umkmItems} />
       </div>
 
       <p className="mt-4 text-xs text-ink-900/50">

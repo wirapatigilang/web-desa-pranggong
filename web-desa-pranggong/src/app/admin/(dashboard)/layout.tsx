@@ -27,6 +27,12 @@ export default async function DashboardLayout({
           >
             Profil Desa
           </Link>
+          <Link
+            href="/admin/umkm"
+            className="block rounded-md px-3 py-2 hover:bg-accent hover:text-accent-foreground"
+          >
+            UMKM
+          </Link>
         </nav>
       </aside>
 
