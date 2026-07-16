@@ -33,6 +33,7 @@
 - Helper auth guard `requireSession()` dipusatkan di `src/lib/actions/require-session.ts`, dipakai semua server action admin (`posts.ts`, `profile.ts`, `umkm.ts`). Kalau bikin action admin baru, import dari situ, jangan tulis ulang.
 - Data UMKM dari database (`prisma.umkm`), diedit lewat `/admin/umkm`. `lat`/`lng` OPSIONAL (nullable) — kalau kosong, UMKM tetap tampil di "Potensi Desa" tapi tidak jadi pinpoint di peta. Halaman `/peta-desa` (server component) yang menggabungkan `villageLocations` statis + UMKM dari DB jadi satu array sebelum dikirim ke `VillageExplorer` — lihat `src/app/(site)/peta-desa/page.tsx`.
 - Tombol hapus admin dipusatkan jadi `src/components/admin/confirm-delete-button.tsx` (generik, dipakai Post & UMKM). **PENTING kalau dipakai dari Server Component**: prop `onConfirm` HARUS diisi server action yang di-`.bind(null, id)`, JANGAN bungkus jadi closure baru (`() => deleteX(id)`) — React/Next.js RSC cuma bisa serialize *server action reference* (termasuk hasil `.bind()`), bukan closure biasa. Lihat log 2026-07-16 "UMKM" di bawah untuk detail bug-nya.
+- `/admin` punya dark mode (toggle di `src/components/admin/theme-toggle.tsx`), dilingkupi ke `#admin-shell` (`src/app/admin/layout.tsx`) — situs publik TIDAK punya dark mode dan tidak boleh ikut kena kalau nanti ubah-ubah scoping ini.
 
 ## Struktur Route (app/)
 
@@ -51,6 +52,15 @@
 | `/admin/posts/new`, `/admin/posts/[id]/edit` | Selesai — form create/edit (shadcn) |
 
 ## Log Pengerjaan
+
+### 2026-07-16 — Dark mode untuk halaman admin
+- User minta dark mode khusus untuk `/admin` (situs publik tidak diminta, dan memang tidak cocok — palet moss/paper/gold sudah dirancang sebagai identitas resmi tunggal, bukan sistem light/dark).
+- Tidak pakai `next-themes` (belum ada izin nambah dependency untuk itu) — dibuat manual, dilingkupi ketat ke elemen `#admin-shell` (div pembungkus di `src/app/admin/layout.tsx`), BUKAN ke `<html>`/`<body>` yang notabene dipakai bareng situs publik. Class `.dark` dari shadcn (`--background`, `--foreground`, dst di `globals.css`) sudah otomatis tersedia sejak `shadcn init` dulu, cuma belum pernah diaktifkan.
+- Anti-flash: `<script>` inline (`dangerouslySetInnerHTML`) di `admin/layout.tsx`, jadi child pertama `#admin-shell`, baca `localStorage.getItem("admin-theme")` dan pasang class `dark` SEBELUM React hydrate — kalau ditaruh di `useEffect` biasa, akan sempat kelihatan kedip mode terang dulu baru gelap.
+- `src/components/admin/theme-toggle.tsx`: sengaja TIDAK pakai `useState`/`useEffect` untuk sinkronisasi ikon (sempat dicoba, kena lint error `react-hooks/set-state-in-effect` — proyek ini pakai versi eslint-plugin-react-hooks yang melarang pola "baca state DOM lalu setState di effect saat mount"). Solusi lebih simpel: render KEDUA ikon (Sun & Moon) sekaligus, switch tampilannya pakai utility `dark:hidden`/`dark:block` (CSS murni, tidak butuh JS state, otomatis konsisten dengan class yang di-toggle). Klik tombol cuma toggle `classList` + simpan ke `localStorage`.
+- Dipasang di header dashboard (`src/app/admin/(dashboard)/layout.tsx`) dan pojok kanan atas halaman login (`src/app/admin/login/page.tsx`).
+- Verifikasi: `npm run lint` bersih, `npm run build` sukses (15 route, tidak ada perubahan skema jadi tidak perlu restart dev server untuk urusan Prisma). Smoke-test curl: `/admin/login` dan `/admin` (dengan sesi) sama-sama mengandung tombol toggle; homepage publik dicek tidak mengandung `id="admin-shell"` sama sekali — konfirmasi scoping-nya benar-benar terpisah.
+- **Belum diuji visual di browser sungguhan** (curl cuma bisa cek HTML/class hadir, bukan tampilan gelap beneran kelihatan benar) — coba klik tombolnya dan pastikan transisi warnanya enak dilihat.
 
 ### 2026-07-16 — UMKM jadi data database, diinput admin lewat dashboard
 - User minta: data UMKM/produk unggulan yang sebelumnya statis di `src/lib/village-locations.ts` (2 entri placeholder `umkm-1`/`umkm-2`) sekarang harus dari database dan bisa diinput admin sendiri.

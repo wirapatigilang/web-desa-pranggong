@@ -2,6 +2,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import SignOutButton from "@/components/admin/sign-out-button";
+import ThemeToggle from "@/components/admin/theme-toggle";
 
 export default async function DashboardLayout({
   children,
@@ -48,6 +49,7 @@ export default async function DashboardLayout({
             >
               Lihat situs →
             </Link>
+            <ThemeToggle />
             <SignOutButton />
           </div>
         </header>
