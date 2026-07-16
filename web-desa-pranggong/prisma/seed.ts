@@ -78,9 +78,48 @@ async function seedPosts() {
   console.log(`Post awal disiapkan: ${initialPosts.length}`);
 }
 
+// Migrasi konten placeholder yang sebelumnya statis di src/lib/village-profile.ts ke database.
+async function seedVillageProfile() {
+  const defaultOrgStructure = [
+    { role: "Kepala Desa", name: "" },
+    { role: "Sekretaris Desa", name: "" },
+    { role: "Kepala Urusan Keuangan", name: "" },
+    { role: "Kepala Urusan Umum & Perencanaan", name: "" },
+    { role: "Kepala Seksi Pemerintahan", name: "" },
+    { role: "Kepala Seksi Kesejahteraan", name: "" },
+    { role: "Kepala Seksi Pelayanan", name: "" },
+    { role: "Kepala Dusun", name: "" },
+  ];
+
+  await prisma.villageProfile.upsert({
+    where: { id: "singleton" },
+    update: {},
+    create: {
+      id: "singleton",
+      history:
+        "Sejarah lengkap Desa Pranggong — asal-usul nama, tokoh pendiri, dan perkembangan wilayah dari masa ke masa — akan dilengkapi bersama perangkat desa dan sesepuh setempat.",
+      vision:
+        "Visi resmi Desa Pranggong untuk periode kepemimpinan saat ini akan dilengkapi oleh perangkat desa.",
+      missions: "Poin-poin misi akan diisi sesuai dokumen RPJM Desa yang berlaku.",
+      orgStructure: JSON.stringify(defaultOrgStructure),
+      area: "— (data belum diperbarui)",
+      population: "— (data belum diperbarui)",
+      households: "— (data belum diperbarui)",
+      hamlets: "— (data belum diperbarui)",
+      boundaryNorth: "— (data belum diperbarui)",
+      boundarySouth: "— (data belum diperbarui)",
+      boundaryEast: "— (data belum diperbarui)",
+      boundaryWest: "— (data belum diperbarui)",
+    },
+  });
+
+  console.log("Profil desa awal disiapkan.");
+}
+
 Promise.resolve()
   .then(main)
   .then(seedPosts)
+  .then(seedVillageProfile)
   .catch((error) => {
     console.error(error);
     process.exitCode = 1;

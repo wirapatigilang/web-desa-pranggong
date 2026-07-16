@@ -18,6 +18,26 @@ enum PostType {
   berita
 }
 
+// Satu baris singleton (id selalu "singleton") — konten halaman Profil Desa,
+// diedit admin lewat /admin/profil. missions = satu poin per baris.
+// orgStructure = JSON string array of {role, name}.
+model VillageProfile {
+  id             String   @id @default("singleton")
+  history        String
+  vision         String
+  missions       String
+  orgStructure   String
+  area           String
+  population     String
+  households     String
+  hamlets        String
+  boundaryNorth  String
+  boundarySouth  String
+  boundaryEast   String
+  boundaryWest   String
+  updatedAt      DateTime @updatedAt
+}
+
 model Post {
   id        String   @id @default(cuid())
   type      PostType

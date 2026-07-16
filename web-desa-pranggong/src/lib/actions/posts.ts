@@ -1,19 +1,10 @@
 "use server";
 
-import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/actions/require-session";
 import { PostType } from "../../generated/prisma/enums";
-
-async function requireSession() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) {
-    redirect("/admin/login");
-  }
-  return session;
-}
 
 function slugify(title: string) {
   return title

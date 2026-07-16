@@ -21,6 +21,12 @@ export default async function DashboardLayout({
           >
             Berita &amp; Pengumuman
           </Link>
+          <Link
+            href="/admin/profil"
+            className="block rounded-md px-3 py-2 hover:bg-accent hover:text-accent-foreground"
+          >
+            Profil Desa
+          </Link>
         </nav>
       </aside>
 

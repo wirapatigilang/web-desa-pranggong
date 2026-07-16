@@ -89,7 +89,7 @@ Ditambah fitur-fitur dasar profil desa agar website layak disebut "website desa"
   - [x] Ringkasan sambutan Kepala Desa
   - [x] Highlight berita/blog terbaru
   - [x] Highlight program kerja KKN
-- [x] **Profil Desa** *(struktur & layout selesai, isi konten masih placeholder — lihat `src/lib/village-profile.ts`)*
+- [x] **Profil Desa** *(struktur & layout selesai; konten sekarang dari database dan bisa diedit admin sendiri lewat `/admin/profil` — termasuk struktur organisasi saat pergantian perangkat desa, lihat PROGRESS.md 2026-07-16. Isi masih placeholder sampai perangkat desa mengisi.)*
   - [x] Sejarah desa
   - [x] Visi & misi
   - [x] Struktur organisasi pemerintahan desa

@@ -10,10 +10,11 @@
 - Tahap selesai: **Tahap 1 — Setup project, layout dasar, navigasi, homepage**
 - **Urutan tahap diubah atas permintaan user (2026-07-14)**: peta interaktif dimajukan jadi **Tahap 2**, profil desa mundur jadi **Tahap 3** (lihat log di bawah & `requirement.md` §7).
 - Tahap 2 (peta interaktif): prototype ada di `/peta-desa`, belum final (koordinat placeholder).
-- Tahap 3 — Profil Desa: `/profil-desa` sudah diisi (sejarah, visi-misi, data geografis/demografis, struktur organisasi), **semua isinya masih placeholder eksplisit** (belum data resmi dari perangkat desa — lihat `src/lib/village-profile.ts`). Sisa: layanan publik, potensi wisata, galeri.
+- Tahap 3 — Profil Desa: `/profil-desa` sudah diisi (sejarah, visi-misi, data geografis/demografis, struktur organisasi). **Sejak 2026-07-16, konten ini bisa diedit admin sendiri lewat `/admin/profil`** (database, bukan lagi kode statis) — isinya masih placeholder sampai perangkat desa mengisi lewat dashboard. Sisa checklist §4.4: layanan publik, potensi wisata, galeri.
 - **Tahap 4 (Rocket Stove) — SELESAI (struktur & teks)**: `/program-kerja/rocket-stove` sudah diisi penuh. Foto dokumentasi masih `ImagePlaceholder` (belum ada foto asli dari tim KKN).
 - **Tahap 5 — SELESAI (inti)**: CRUD Berita/Pengumuman + auth admin + database sudah jalan. Detail lengkap di log 2026-07-15 "Tahap 5". Sisa: form upload gambar cover (belum ada), pagination (belum perlu, data masih sedikit).
 - Tahap berikutnya: sisa Tahap 3 (layanan publik/potensi wisata/galeri), ATAU poles Tahap 5 (upload gambar), ATAU isi foto asli Rocket Stove menggantikan placeholder — tunggu arahan user.
+- **Login pertama kali? Baca log 2026-07-16 "Fix: login admin gagal" di bawah dulu** kalau login tidak jalan — ada gotcha soal env var yang gampang terulang.
 - **PENTING sebelum deploy**: ganti `ADMIN_EMAIL`/`ADMIN_PASSWORD` di `.env` (masih nilai contoh) dan `BETTER_AUTH_SECRET`, lalu jalankan `prisma db seed` di environment produksi. Tidak ada form pendaftaran publik by design — akun admin cuma bisa dibuat lewat seed script.
 
 ## Arsitektur / Konvensi Project
@@ -28,13 +29,16 @@
 - **Next.js 16**: file konvensi `middleware.ts` sudah deprecated, diganti `proxy.ts` (fungsi export bernama `proxy`, bukan `middleware`) — lihat `node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/proxy.md` kalau perlu detail lebih lanjut.
 - **Database & Auth**: Prisma 7 (generator baru `prisma-client`, BUKAN `prisma-client-js` lama) + PostgreSQL lokal (`web_desa_pranggong`, dibuat via `createdb`) + Better Auth (email/password saja, TANPA sign-up publik). Detail teknis penting di log 2026-07-15 "Tahap 5" — WAJIB dibaca sebelum utak-atik Prisma/auth, karena konvensinya beda signifikan dari Prisma versi lama yang mungkin diasumsikan agent lain.
 - Data Berita/Pengumuman sekarang dari database (`prisma.post`), BUKAN lagi array statis. `src/lib/posts.ts` cuma nyisa `postTypeLabels` (label tampilan).
+- Data Profil Desa juga dari database (`prisma.villageProfile`, satu baris singleton `id: "singleton"`), diedit lewat `/admin/profil`. `src/lib/village-profile.ts` isinya sekarang fungsi `getVillageProfile()` (async, query DB), BUKAN lagi konstanta statis — kalau import dari situ, ingat itu perlu di-`await`.
+- Helper auth guard `requireSession()` dipusatkan di `src/lib/actions/require-session.ts`, dipakai semua server action admin (`posts.ts`, `profile.ts`). Kalau bikin action admin baru, import dari situ, jangan tulis ulang.
 
 ## Struktur Route (app/)
 
 | Route | Status |
 |---|---|
 | `/` | Selesai — homepage (hero, sambutan, highlight program kerja, highlight blog) |
-| `/profil-desa` | Selesai (Tahap 3) — sejarah, visi-misi, data wilayah, struktur organisasi; isi konten masih placeholder |
+| `/profil-desa` | Selesai (Tahap 3) — sejarah, visi-misi, data wilayah, struktur organisasi; konten dari database, bisa diedit admin |
+| `/admin/profil` | Selesai — form edit konten Profil Desa (termasuk repeater struktur organisasi) |
 | `/peta-desa` | Prototype Tahap 2 — peta interaktif Leaflet aktif, koordinat masih placeholder |
 | `/program-kerja/rocket-stove` | Selesai (Tahap 4) — teks lengkap, foto masih placeholder |
 | `/blog` | Selesai — "Berita & Pengumuman" dari database, filter tipe |
@@ -44,6 +48,20 @@
 | `/admin/posts/new`, `/admin/posts/[id]/edit` | Selesai — form create/edit (shadcn) |
 
 ## Log Pengerjaan
+
+### 2026-07-16 — Profil Desa jadi bisa diedit admin (khusus untuk pergantian perangkat desa)
+- User minta: admin desa bisa edit teks di `/profil-desa` sendiri lewat dashboard, terutama kalau ada pergantian perangkat desa (nama pejabat berubah).
+- Model baru `VillageProfile` di `prisma/schema.prisma` — **satu baris singleton** (`id` selalu `"singleton"`, pakai `@default("singleton")`), bukan banyak baris, karena profil desa cuma satu per desa. Field: `history`, `vision`, `missions` (teks satu poin per baris, di-split jadi array saat dibaca), `orgStructure` (JSON string array `{role, name}`), plus `area/population/households/hamlets` dan `boundaryNorth/South/East/West`.
+- Migrasi `add_village_profile` dijalankan, dan `prisma/seed.ts` ditambah `seedVillageProfile()` (upsert, aman dijalankan ulang) yang memindahkan isi placeholder yang sebelumnya hardcode di `src/lib/village-profile.ts` ke database.
+- `src/lib/village-profile.ts` berubah total: dari **konstanta statis** jadi **fungsi async `getVillageProfile()`** yang query `prisma.villageProfile`. Kalau ada kode lama yang masih import `history`/`visionMission`/`orgStructure`/`demographics` langsung dari file ini, itu SUDAH TIDAK ADA — harus pindah ke `await getVillageProfile()`.
+- Server action `src/lib/actions/profile.ts` — `updateVillageProfile()`, validasi field wajib (history/vision/missions), parse+validasi JSON `orgStructure` dari hidden input, upsert ke DB.
+- **Refactor kecil**: `requireSession()` yang tadinya private di `src/lib/actions/posts.ts` dipindah jadi shared helper `src/lib/actions/require-session.ts`, dipakai `posts.ts` dan `profile.ts` — biar tidak duplikat guard auth di setiap action file baru.
+- UI admin: `src/components/admin/profile-form.tsx` (textarea untuk sejarah/visi/misi, input untuk data wilayah) + `src/components/admin/org-structure-editor.tsx` — **repeater client-side** untuk struktur organisasi (baris jabatan+nama, tombol tambah/hapus baris, di-state React lalu diserialisasi ke JSON lewat `<input type="hidden" name="orgStructure">`). Ini bagian yang paling relevan buat kasus "pergantian perangkat desa" — admin tinggal ganti nama di baris yang sesuai, atau tambah/hapus baris kalau jabatannya sendiri berubah.
+- Halaman `/admin/profil` (baru) + link sidebar "Profil Desa" ditambah di `src/app/admin/(dashboard)/layout.tsx`.
+- Halaman publik `/profil-desa` diupdate baca dari `getVillageProfile()`, field batas wilayah sekarang flat (`profile.boundaryNorth` dst) bukan nested `.boundaries.north` seperti struktur lama.
+- **Penting — gotcha yang SAMA dengan kasus login kemarin**: setiap kali skema Prisma berubah (nambah model), `prisma generate` menghasilkan ulang `src/generated/prisma`, tapi instance `PrismaClient` yang sudah nyangkut di `globalThis` (lihat `src/lib/prisma.ts`) tetap instance LAMA sampai dev server di-restart total. Sudah restart dev server setelah migrasi ini — kalau field/model baru "tidak ketemu" padahal migrate sukses, itu penyebabnya.
+- Verifikasi: `npm run lint` bersih, `npm run build` sukses (13 route, `/admin/profil` dinamis sesuai ekspektasi). Smoke test curl: `/profil-desa` → 200, struktur organisasi dari DB muncul ("Kepala Desa", "Nama belum diisi"). Login admin → `/admin/profil` → 200, form + tombol "Tambah Jabatan" muncul.
+- **Belum diuji lewat browser sungguhan**: submit form edit profil (perubahan tersimpan ke DB, repeater tambah/hapus baris). Secara kode sudah benar (form ini tidak pakai komponen Radix Select/Checkbox yang form-participation-nya perlu diverifikasi seperti kasus `post-form.tsx` — semua field di sini native `<input>`/`<textarea>`), tapi **tolong coba edit satu field dan submit beneran** untuk pastikan.
 
 ### 2026-07-16 — Tahap 4: Halaman Rocket Stove
 - Diminta lanjut Tahap 4 yang sempat di-skip, dengan placeholder untuk gambar (belum ada foto dokumentasi asli dari tim KKN).

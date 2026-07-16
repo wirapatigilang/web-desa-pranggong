@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
 import Eyebrow from "@/components/ui/eyebrow";
 import { siteConfig } from "@/lib/site-config";
-import {
-  demographics,
-  history,
-  orgStructure,
-  visionMission,
-} from "@/lib/village-profile";
+import { getVillageProfile } from "@/lib/village-profile";
 
 export const metadata: Metadata = {
   title: "Profil Desa",
@@ -14,21 +9,23 @@ export const metadata: Metadata = {
     "Sejarah, visi & misi, struktur organisasi, serta data geografis dan demografis Desa Pranggong.",
 };
 
-const demographicStats = [
-  { label: "Luas Wilayah", value: demographics.area },
-  { label: "Jumlah Penduduk", value: demographics.population },
-  { label: "Jumlah Kepala Keluarga", value: demographics.households },
-  { label: "Jumlah Dusun", value: demographics.hamlets },
-];
+export default async function ProfilDesaPage() {
+  const profile = await getVillageProfile();
 
-const boundaries = [
-  { label: "Utara", value: demographics.boundaries.north },
-  { label: "Selatan", value: demographics.boundaries.south },
-  { label: "Timur", value: demographics.boundaries.east },
-  { label: "Barat", value: demographics.boundaries.west },
-];
+  const demographicStats = [
+    { label: "Luas Wilayah", value: profile.area },
+    { label: "Jumlah Penduduk", value: profile.population },
+    { label: "Jumlah Kepala Keluarga", value: profile.households },
+    { label: "Jumlah Dusun", value: profile.hamlets },
+  ];
 
-export default function ProfilDesaPage() {
+  const boundaries = [
+    { label: "Utara", value: profile.boundaryNorth },
+    { label: "Selatan", value: profile.boundarySouth },
+    { label: "Timur", value: profile.boundaryEast },
+    { label: "Barat", value: profile.boundaryWest },
+  ];
+
   return (
     <div className="flex flex-col">
       <div className="mx-auto max-w-6xl px-4 pt-16 sm:px-6">
@@ -50,9 +47,7 @@ export default function ProfilDesaPage() {
           Sejarah Desa
         </h2>
         <div className="mt-4 max-w-3xl space-y-4 text-ink-900/70">
-          {history.paragraphs.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
+          <p>{profile.history}</p>
         </div>
       </section>
 
@@ -65,14 +60,14 @@ export default function ProfilDesaPage() {
               <h2 className="font-display text-xl font-semibold text-ink-900">
                 Visi
               </h2>
-              <p className="mt-3 text-ink-900/70">{visionMission.vision}</p>
+              <p className="mt-3 text-ink-900/70">{profile.vision}</p>
             </div>
             <div>
               <h2 className="font-display text-xl font-semibold text-ink-900">
                 Misi
               </h2>
               <ol className="mt-3 list-decimal space-y-2 pl-5 text-ink-900/70">
-                {visionMission.missions.map((mission) => (
+                {profile.missions.map((mission) => (
                   <li key={mission}>{mission}</li>
                 ))}
               </ol>
@@ -125,17 +120,22 @@ export default function ProfilDesaPage() {
           </h2>
 
           <ul className="mt-6 divide-y divide-paper-50/10 border border-paper-50/15">
-            {orgStructure.map((entry) => (
+            {profile.orgStructure.map((entry) => (
               <li
                 key={entry.role}
                 className="flex flex-wrap items-center justify-between gap-2 px-5 py-4"
               >
                 <span className="font-medium text-paper-50">{entry.role}</span>
                 <span className="text-sm text-paper-50/50">
-                  {entry.name ?? "Nama belum diisi"}
+                  {entry.name || "Nama belum diisi"}
                 </span>
               </li>
             ))}
+            {profile.orgStructure.length === 0 && (
+              <li className="px-5 py-4 text-sm text-paper-50/50">
+                Struktur organisasi belum diisi.
+              </li>
+            )}
           </ul>
         </div>
       </section>
