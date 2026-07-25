@@ -1,6 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,10 +19,20 @@ export default function ProfileForm({
 }: {
   defaultValues: VillageProfileData;
 }) {
+  const router = useRouter();
   const [state, formAction, pending] = useActionState<
     ProfileFormState,
     FormData
   >(updateVillageProfile, {});
+
+  useEffect(() => {
+    if (state.success) {
+      toast.success("Perubahan berhasil disimpan.");
+      router.refresh();
+    } else if (state.error) {
+      toast.error(state.error);
+    }
+  }, [state, router]);
 
   return (
     <form action={formAction} className="max-w-3xl space-y-8">

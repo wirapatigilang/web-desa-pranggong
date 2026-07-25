@@ -1,11 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/actions/require-session";
 
-export type UmkmFormState = { error?: string };
+export type UmkmFormState = { error?: string; success?: boolean };
 
 function parseCoordinate(value: FormDataEntryValue | null): number | null {
   const trimmed = String(value ?? "").trim();
@@ -48,7 +47,7 @@ export async function createUmkm(
 
   revalidatePath("/admin/umkm");
   revalidatePath("/peta-desa");
-  redirect("/admin/umkm");
+  return { success: true };
 }
 
 export async function updateUmkm(
@@ -92,7 +91,7 @@ export async function updateUmkm(
 
   revalidatePath("/admin/umkm");
   revalidatePath("/peta-desa");
-  redirect("/admin/umkm");
+  return { success: true };
 }
 
 export async function deleteUmkm(id: string) {

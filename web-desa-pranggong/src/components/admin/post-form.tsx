@@ -1,7 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,7 +28,17 @@ export default function PostForm({
   defaultValues?: Pick<Post, "title" | "excerpt" | "content" | "type" | "pinned">;
   submitLabel: string;
 }) {
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(action, {});
+
+  useEffect(() => {
+    if (state.success) {
+      toast.success("Perubahan berhasil disimpan.");
+      router.push("/admin");
+    } else if (state.error) {
+      toast.error(state.error);
+    }
+  }, [state, router]);
 
   return (
     <form action={formAction} className="space-y-5">

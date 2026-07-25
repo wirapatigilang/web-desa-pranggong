@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/actions/require-session";
 import { PostType } from "../../generated/prisma/enums";
@@ -27,7 +26,7 @@ async function uniqueSlug(title: string, ignoreId?: string) {
   }
 }
 
-export type PostFormState = { error?: string };
+export type PostFormState = { error?: string; success?: boolean };
 
 export async function createPost(
   _prevState: PostFormState,
@@ -57,7 +56,7 @@ export async function createPost(
   revalidatePath("/admin");
   revalidatePath("/blog");
   revalidatePath("/");
-  redirect("/admin");
+  return { success: true };
 }
 
 export async function updatePost(
@@ -96,7 +95,7 @@ export async function updatePost(
   revalidatePath("/admin");
   revalidatePath("/blog");
   revalidatePath("/");
-  redirect("/admin");
+  return { success: true };
 }
 
 export async function deletePost(id: string) {

@@ -5,22 +5,25 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-source-serif);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-montserrat);
 
-  /* Identitas visual resmi Pemerintah Desa Pranggong — hijau institusional + aksen emas */
-  --color-moss-900: #16241a;
-  --color-moss-700: #24402a;
-  --color-moss-600: #2f5233;
-  --color-moss-500: #3f6b45;
-  --color-gold-600: #b8902e;
-  --color-gold-300: #e6cd85;
-  --color-merah-600: #b91c2c;
-  --color-paper-50: #fbf9f1;
-  --color-paper-100: #f3eedd;
-  --color-ink-900: #1c2a1e;
-  --font-heading: var(--font-sans);
+  /* Identitas "Village Community System" — hijau + putih/abu netral.
+     Nama token dipertahankan dari palet sebelumnya (moss/gold/paper) supaya tidak perlu
+     ubah class di puluhan file; cuma NILAI hex-nya yang diganti. Peta makna sekarang:
+     moss-*  = Primary (hijau utama, ramp gelap→terang)
+     gold-*  = aksen sekunder (gold-600 dipakai di atas bg terang, gold-300 di atas bg gelap)
+     paper-50 = Tertiary (putih), paper-100 = Neutral (abu terang) */
+  --color-moss-900: #123817;
+  --color-moss-700: #17501d;
+  --color-moss-600: #1b5e20;
+  --color-moss-500: #4f9a54;
+  --color-gold-600: #2e7d32;
+  --color-gold-300: #81c784;
+  --color-paper-50: #ffffff;
+  --color-paper-100: #f5f5f5;
+  --color-ink-900: #1a1a1a;
+  --font-heading: var(--font-display);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);

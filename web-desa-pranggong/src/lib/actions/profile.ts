@@ -1,11 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/actions/require-session";
 
-export type ProfileFormState = { error?: string };
+export type ProfileFormState = { error?: string; success?: boolean };
 
 export async function updateVillageProfile(
   _prevState: ProfileFormState,
@@ -79,5 +78,5 @@ export async function updateVillageProfile(
 
   revalidatePath("/admin/profil");
   revalidatePath("/profil-desa");
-  redirect("/admin/profil");
+  return { success: true };
 }

@@ -66,7 +66,7 @@ export default function VillageMap({
   const markerRefs = useRef<Record<string, L.Marker | null>>({});
 
   return (
-    <div className="relative isolate z-0 overflow-hidden border border-moss-900/10 shadow-sm">
+    <div className="relative isolate z-0 overflow-hidden rounded-2xl border border-moss-900/10 shadow-sm">
       <MapContainer
         center={mapCenter}
         zoom={15}
@@ -92,9 +92,9 @@ export default function VillageMap({
             }}
           >
             <Popup>
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-gold-600">
+              <span className="inline-block rounded-full bg-gold-600/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gold-600">
                 {categoryLabels[location.category]}
-              </p>
+              </span>
               <p className="mt-1 font-semibold text-ink-900">{location.name}</p>
               <p className="mt-1 text-sm text-ink-900/70">{location.description}</p>
               {location.hours && (

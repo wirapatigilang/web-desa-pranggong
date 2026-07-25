@@ -30,8 +30,12 @@ export default function ConfirmDeleteButton({
 
   function handleDelete() {
     startTransition(async () => {
-      await onConfirm();
-      toast.success(successMessage);
+      try {
+        await onConfirm();
+        toast.success(successMessage);
+      } catch {
+        toast.error("Gagal menghapus. Coba lagi.");
+      }
     });
   }
 

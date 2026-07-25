@@ -55,7 +55,7 @@ export default function VillageExplorer({
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Cari lokasi… mis. Posyandu, Masjid"
-          className="w-full border border-moss-900/20 bg-paper-50 px-4 py-2.5 text-sm text-ink-900 placeholder:text-ink-900/40 focus:border-moss-600 focus:outline-none"
+          className="w-full rounded-xl border border-moss-900/20 bg-paper-50 px-4 py-2.5 text-sm text-ink-900 placeholder:text-ink-900/40 focus:border-moss-600 focus:outline-none"
         />
       </label>
 
@@ -63,7 +63,7 @@ export default function VillageExplorer({
         <button
           type="button"
           onClick={() => setActiveCategory("semua")}
-          className={`border px-3 py-1.5 text-sm transition-colors ${
+          className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
             activeCategory === "semua"
               ? "border-moss-600 bg-moss-600 text-paper-50"
               : "border-moss-900/15 text-ink-900/70 hover:border-moss-600/50"
@@ -76,7 +76,7 @@ export default function VillageExplorer({
             key={category}
             type="button"
             onClick={() => setActiveCategory(category)}
-            className={`flex items-center gap-2 border px-3 py-1.5 text-sm transition-colors ${
+            className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors ${
               activeCategory === category
                 ? "border-moss-600 bg-moss-600 text-paper-50"
                 : "border-moss-900/15 text-ink-900/70 hover:border-moss-600/50"
@@ -94,7 +94,7 @@ export default function VillageExplorer({
       <div ref={mapSectionRef} className="mt-6 grid gap-6 scroll-mt-20 lg:grid-cols-[1fr_280px]">
         <VillageMapLoader locations={filtered} focusId={focusId} />
 
-        <div className="border border-moss-900/10">
+        <div className="overflow-hidden rounded-2xl border border-moss-900/10">
           <p className="border-b border-moss-900/10 bg-paper-100 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-ink-900/60">
             {filtered.length} lokasi ditemukan
           </p>
@@ -138,10 +138,13 @@ export default function VillageExplorer({
             const mapLocationId = `umkm-${item.id}`;
             const onMap = locations.some((l) => l.id === mapLocationId);
             return (
-              <div key={item.id} className="border border-moss-900/10 p-5">
-                <p className="text-xs font-semibold uppercase tracking-wide text-gold-600">
+              <div
+                key={item.id}
+                className="rounded-2xl border border-moss-900/10 p-5"
+              >
+                <span className="inline-block rounded-full bg-gold-600/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-gold-600">
                   {categoryLabels.umkm}
-                </p>
+                </span>
                 <h3 className="mt-2 font-display text-lg font-semibold text-ink-900">
                   {item.name}
                 </h3>

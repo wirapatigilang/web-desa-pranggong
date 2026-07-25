@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Eyebrow from "@/components/ui/eyebrow";
+import Reveal from "@/components/motion/reveal";
 import PostList from "@/components/blog/post-list";
 import { prisma } from "@/lib/prisma";
 
@@ -15,14 +16,16 @@ export default async function BlogPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <Eyebrow>Kabar Desa</Eyebrow>
-      <h1 className="mt-3 font-display text-3xl font-semibold text-ink-900 sm:text-4xl">
-        Berita &amp; Pengumuman
-      </h1>
-      <p className="mt-3 max-w-2xl text-ink-900/70">
-        Pengumuman resmi dan berita kegiatan Desa Pranggong dalam satu kanal.
-        Saring berdasarkan kategori di bawah.
-      </p>
+      <Reveal>
+        <Eyebrow>Kabar Desa</Eyebrow>
+        <h1 className="mt-3 font-display text-3xl font-semibold text-ink-900 sm:text-4xl">
+          Berita &amp; Pengumuman
+        </h1>
+        <p className="mt-3 max-w-2xl text-ink-900/70">
+          Pengumuman resmi dan berita kegiatan Desa Pranggong dalam satu
+          kanal. Saring berdasarkan kategori di bawah.
+        </p>
+      </Reveal>
 
       <div className="mt-8">
         <PostList posts={posts} />

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { navLinks, siteConfig } from "@/lib/site-config";
 
 export default function Navbar() {
@@ -10,33 +11,22 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-moss-900/10 bg-paper-50/95 backdrop-blur">
-      <div className="flex h-1 w-full" aria-hidden="true">
-        <span className="flex-1 bg-merah-600" />
-        <span className="flex-1 bg-white" />
-        <span className="flex-1 bg-moss-600" />
-      </div>
+    <header className="sticky top-0 z-50 border-b border-black/5 bg-paper-50/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <Link
           href="/"
           className="flex items-center gap-3"
           onClick={() => setOpen(false)}
         >
-          <span
-            className="flex h-9 w-9 shrink-0 items-center justify-center bg-moss-600 text-sm font-semibold text-paper-50"
-            style={{
-              clipPath:
-                "polygon(50% 0%, 100% 20%, 100% 65%, 50% 100%, 0% 65%, 0% 20%)",
-            }}
-          >
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-moss-600 text-sm font-semibold text-paper-50">
             DP
           </span>
           <span className="leading-tight">
             <span className="block font-display text-lg font-semibold text-ink-900">
               {siteConfig.name}
             </span>
-            <span className="block text-[11px] uppercase tracking-wide text-ink-900/60">
-              Pemerintah Desa · Kec. {siteConfig.kecamatan}
+            <span className="block text-[11px] text-ink-900/50">
+              Kec. {siteConfig.kecamatan}, Kab. {siteConfig.kabupaten}
             </span>
           </span>
         </Link>
@@ -51,10 +41,10 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                   active
                     ? "bg-moss-600 text-paper-50"
-                    : "text-ink-900 hover:bg-moss-600/10"
+                    : "text-ink-900/70 hover:bg-moss-600/10 hover:text-ink-900"
                 }`}
               >
                 {link.label}
@@ -65,7 +55,7 @@ export default function Navbar() {
 
         <button
           type="button"
-          className="flex h-9 w-9 items-center justify-center rounded-md text-ink-900 md:hidden"
+          className="flex h-9 w-9 items-center justify-center rounded-full text-ink-900 md:hidden"
           aria-label="Buka menu navigasi"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
@@ -90,30 +80,40 @@ export default function Navbar() {
         </button>
       </div>
 
-      {open && (
-        <nav className="border-t border-moss-900/10 bg-paper-50 px-4 py-2 md:hidden">
-          {navLinks.map((link) => {
-            const active =
-              link.href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(link.href);
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className={`block rounded-md px-3 py-2 text-sm font-medium ${
-                  active
-                    ? "bg-moss-600 text-paper-50"
-                    : "text-ink-900 hover:bg-moss-600/10"
-                }`}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
-      )}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.nav
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="overflow-hidden border-t border-moss-900/10 bg-paper-50 md:hidden"
+          >
+            <div className="px-4 py-2">
+              {navLinks.map((link) => {
+                const active =
+                  link.href === "/"
+                    ? pathname === "/"
+                    : pathname.startsWith(link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className={`block rounded-xl px-3 py-2 text-sm font-medium ${
+                      active
+                        ? "bg-moss-600 text-paper-50"
+                        : "text-ink-900 hover:bg-moss-600/10"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
