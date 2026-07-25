@@ -52,18 +52,8 @@ export const villageLocations: VillageLocation[] = [
     description: "Pusat pemerintahan dan pelayanan administrasi Desa Pranggong.",
     contact: "0812-xxxx-xxxx",
     hours: "Senin–Jumat, 08.00–15.00 WIB",
-    lat: -7.3611,
-    lng: 110.7551,
-  },
-  {
-    id: "posyandu",
-    name: "Posyandu Desa Pranggong",
-    category: "kesehatan",
-    description: "Layanan kesehatan ibu, anak, dan lansia bagi warga desa.",
-    contact: "0812-xxxx-xxxx",
-    hours: "Setiap tanggal 10, 08.00–11.00 WIB",
-    lat: -7.363,
-    lng: 110.7572,
+    lat: -7.349158,
+    lng: 110.778566,
   },
   {
     id: "sd-pranggong",
@@ -85,15 +75,34 @@ export const villageLocations: VillageLocation[] = [
   },
   {
     id: "rocket-stove",
-    name: "Titik Demo Rocket Stove",
+    name: "Titik Rocket Stove Dukuh Gemulung",
     category: "program-kerja",
     description:
       "Lokasi instalasi dan demo tungku Rocket Stove hasil program kerja KKN.",
     contact: "0812-xxxx-xxxx",
     href: "/program-kerja/rocket-stove",
-    lat: -7.3648,
-    lng: 110.7563,
+    lat: -7.347335,
+    lng: 110.779500,
   },
-  // Catatan: titik UMKM TIDAK lagi di sini — sekarang dari database (model `Umkm`,
-  // diinput admin lewat /admin/umkm) dan digabung ke array ini di src/app/(site)/peta-desa/page.tsx.
+  // UMKM di bawah ini PLACEHOLDER — nama usaha & produk asli menyusul data dari perangkat desa.
+  {
+    id: "umkm-1",
+    name: "UMKM Warga #1",
+    category: "umkm",
+    description:
+      "Nama usaha dan produk unggulan menyusul data resmi dari perangkat desa.",
+    contact: "0812-xxxx-xxxx",
+    lat: -7.362,
+    lng: 110.7545,
+  },
+  {
+    id: "umkm-2",
+    name: "UMKM Warga #2",
+    category: "umkm",
+    description:
+      "Nama usaha dan produk unggulan menyusul data resmi dari perangkat desa.",
+    contact: "0812-xxxx-xxxx",
+    lat: -7.3598,
+    lng: 110.7567,
+  },
 ];
