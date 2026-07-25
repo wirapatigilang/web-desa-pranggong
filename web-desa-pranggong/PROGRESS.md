@@ -53,10 +53,41 @@
 | `/blog` | Selesai — "Berita & Pengumuman" dari database, filter tipe |
 | `/kontak` | Selesai — menampilkan data dari `contactInfo` |
 | `/admin/login` | Selesai — form login (Better Auth email/password) |
-| `/admin` | Selesai — dashboard: tabel post, tombol tambah/edit/hapus |
+| `/admin` | Selesai — **dashboard overview** (stat card, aksi cepat, checklist kelengkapan data, aktivitas terbaru) — BUKAN lagi tabel post |
+| `/admin/posts` | Selesai — tabel post (pindahan dari `/admin` lama), tombol tambah/edit/hapus |
 | `/admin/posts/new`, `/admin/posts/[id]/edit` | Selesai — form create/edit (shadcn) |
 
 ## Log Pengerjaan
+
+### 2026-07-25 — Active state di sidebar admin
+Sidebar admin dari awal tidak pernah ada penanda halaman aktif (beda dengan Navbar situs publik yang sudah punya sejak awal). User minta ditambahkan.
+- Nav sidebar diekstrak dari `admin/(dashboard)/layout.tsx` (Server Component, fetch sesi) jadi komponen terpisah `src/components/admin/sidebar-nav.tsx` (Client Component, pakai `usePathname()`) — pola yang sama persis dengan `Navbar` situs publik. Layout tidak bisa langsung pakai `usePathname` karena dia `async function` yang fetch sesi server-side.
+- Logic active: `/admin` (Dashboard) harus EXACT match (`pathname === "/admin"`), sisanya (`/admin/posts`, `/admin/profil`, `/admin/umkm`) pakai `startsWith` — kalau Dashboard juga pakai `startsWith("/admin")` dia bakal selalu aktif di semua halaman admin (karena semua path memang diawali `/admin`). Item aktif dapat `aria-current="page"` + `bg-primary text-primary-foreground` (otomatis hijau, nyambung ke perubahan accent warna sebelumnya).
+- Verifikasi: `npm run lint` bersih, `npm run build` sukses (16 route). Smoke-test curl: login → `/admin` → "Dashboard" dapat `aria-current="page"`; `/admin/umkm` → "UMKM" yang dapat `aria-current="page"` (bukan Dashboard) — konfirmasi switching-nya benar per halaman.
+
+### 2026-07-25 — Accent hijau di tema shadcn admin + warna toast sukses/gagal/peringatan
+User minta: `/admin` pakai accent hijau seperti landing page (tetap pakai shadcn, bukan ganti komponen), dan toast dikasih warna sesuai arti — sukses hijau, gagal merah, peringatan kuning.
+
+- **Accent hijau**: token shadcn `--primary`/`--primary-foreground`/`--ring` (dan `--sidebar-primary`/`--sidebar-ring` biar konsisten kalau nanti pakai komponen `Sidebar` shadcn beneran) di `:root` (light) diganti `#1b5e20` — PERSIS sama dengan `moss-600` di identitas situs publik. Karena SEMUA komponen shadcn (Button default variant, focus ring Input/Select, dst) sudah baca dari `--primary`/`--ring`, satu perubahan ini otomatis nge-hijau-in seluruh tombol & elemen aktif di admin tanpa perlu sentuh file komponen satu-satu.
+- **Dark mode admin** dikasih hijau lebih terang (`--primary: #4f9a54`, moss-500) + teks gelap di atasnya (`#0f1f10`) — kalau pakai moss-600 yang gelap, kontrasnya jelek di atas background dark mode yang sudah gelap juga.
+- **Ketemu bug kecil di tengah jalan**: `--sidebar-primary` di `.dark` ternyata masih nilai BIRU bawaan preset shadcn (`oklch(0.488 0.243 264.376)`) — sisa dari `shadcn init` dulu yang kelewat, tidak ada hubungannya dengan brand kita sama sekali. Sudah ikut diperbaiki jadi hijau juga.
+- **Token baru** `--warning`/`--warning-foreground` (light: amber-700 `#b45309`, dark: amber-400 `#fbbf24`) — shadcn preset Nova TIDAK punya token "warning" bawaan (cuma ada `--destructive`), jadi ditambah manual dengan pola penamaan yang sama, dan didaftarkan di `@theme inline` (`--color-warning`) supaya utility `bg-warning`/`text-warning` juga tersedia kalau mau dipakai di tempat lain.
+- **Warna toast** (`src/components/ui/sonner.tsx`): success/error/warning masing-masing REUSE token yang sudah ada (`--primary` untuk sukses, `--destructive` yang sudah ada untuk gagal, `--warning` baru untuk peringatan) — TIDAK bikin set warna toast terpisah. Background-nya pakai `color-mix(in oklab, var(--primary) 12%, var(--popover))` dst — otomatis dapat tint tipis yang menyesuaikan sendiri ke light/dark mode tanpa perlu didefinisikan dua kali manual.
+- Verifikasi: `npm run lint` bersih, `npm run build` sukses (16 route). Cek CSS hasil build: `--primary:#1b5e20` (light) dan `--primary:#4f9a54` (dark) ketemu, `--warning:#b45309`/`#fbbf24` ketemu, `color-mix(in oklab, var(--primary) 12%, var(--popover))` ketemu di bundle JS Toaster. Smoke-test curl login → `/admin`, `/admin/posts/new` semua 200.
+- **Belum diuji lewat browser sungguhan**: warna aslinya kelihatan bagus/tidak (terutama di light DAN dark mode admin), dan `toast.warning(...)` belum pernah dipanggil di mana pun di kode — infrastrukturnya sudah siap tapi belum ada trigger nyata yang makai warna kuning ini. Kalau nanti butuh warning beneran, tinggal panggil `toast.warning("pesan")` dari `sonner`.
+
+### 2026-07-25 — Dashboard overview di `/admin` (index admin dipindah dari tabel post)
+User tanya "kira-kira apa saja yang bisa diletakkan di dashboard index admin" — dijawab dengan 4 opsi (kartu ringkasan angka, aktivitas terbaru, pintasan aksi cepat, checklist data placeholder), user pilih SEMUA lewat `AskUserQuestion` multi-select.
+
+- **Restrukturisasi route**: `/admin` yang SEBELUMNYA adalah tabel Berita/Pengumuman langsung, sekarang jadi halaman overview baru. Tabel post yang lama DIPINDAH ke `/admin/posts` (`src/app/admin/(dashboard)/posts/page.tsx`, isinya sama persis, cuma pindah lokasi). Semua referensi yang tadinya `href="/admin"` untuk ke daftar post diupdate ke `/admin/posts`: `post-form.tsx` (`router.push` setelah sukses submit + tombol "Batal"), sidebar (`src/app/admin/(dashboard)/layout.tsx` — link "Berita & Pengumuman" sekarang ke `/admin/posts`, ditambah link baru "Dashboard" di atasnya yang ke `/admin`). Login (`admin/login/page.tsx`) TIDAK berubah — tetap `router.push("/admin")` setelah login, otomatis mendarat di dashboard baru (bukan langsung ke tabel post), yang memang lebih masuk akal.
+- **Halaman baru** `src/app/admin/(dashboard)/page.tsx`:
+  1. **Kartu ringkasan** (4): jumlah Berita, jumlah Pengumuman, jumlah UMKM Terdaftar, status "Data Wilayah" (Lengkap/Belum lengkap) — tiap kartu bisa diklik langsung ke halaman terkait.
+  2. **Aksi cepat**: 3 tombol shortcut (+ Berita/Pengumuman, + UMKM, Edit Profil Desa).
+  3. **Checklist Kelengkapan Data**: cuma tampilkan item yang BELUM lengkap (kalau semua sudah lengkap, tampil pesan positif). Item yang dicek: data geografis/demografis (8 field di `VillageProfile`, deteksi placeholder lewat substring `"belum diperbarui"` — match persis sama teks default dari `seedVillageProfile()`), nama-nama di struktur organisasi (semua entry harus punya `name` terisi), ada minimal 1 UMKM, ada minimal 1 Berita, ada minimal 1 Pengumuman.
+  4. **Aktivitas Terbaru**: gabungan 5 Post + Umkm terakhir diubah (`updatedAt` desc), di-merge & di-sort ulang di JS (bukan query gabungan — Prisma tidak bisa `UNION` lintas model secara native), masing-masing link langsung ke halaman edit-nya.
+- **Keputusan yang SENGAJA tidak dimasukkan ke checklist**: placeholder di `contactInfo` (`src/lib/site-config.ts`, mis. `0812-xxxx-xxxx`) TIDAK dicek/ditampilkan di checklist — karena field itu MASIH statis di kode, belum ada CRUD-nya di dashboard. Checklist yang menunjuk ke sesuatu yang tidak bisa langsung diperbaiki dari situ dianggap menyesatkan buat admin non-teknis. Kalau nanti `contactInfo` dipindah ke database + dapat halaman admin sendiri, baru masuk akal ditambahkan ke checklist ini.
+- Verifikasi: `npm run lint` bersih, `npm run build` sukses (16 route, `/admin/posts` muncul sebagai route baru). Smoke-test curl: login → `/admin` 200 (4 label kartu stat "Berita"/"Pengumuman"/"UMKM Terdaftar"/"Data Wilayah" dikonfirmasi ada di HTML, juga "Aksi Cepat"/"Kelengkapan Data"/"Aktivitas Terbaru"), `/admin/posts` 200 (tabel post pindahan jalan normal).
+- **Belum diuji lewat browser sungguhan**: tampilan dashboard-nya beneran (grid responsif di mobile, warna badge "Berita"/"Pengumuman"/"UMKM" di Aktivitas Terbaru kebaca jelas atau tidak).
 
 ### 2026-07-25 — /peta-desa: badge & kartu jadi rounded corner (nyusul redesign #3)
 Tindak lanjut catatan "belum dikerjakan" dari redesign #3 ("Village Community System") — `/peta-desa` sempat kelewat waktu itu, masih pakai gaya hard-edge lama (border tanpa radius). User minta khusus disamakan.

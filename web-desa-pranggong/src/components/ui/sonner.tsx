@@ -34,6 +34,17 @@ const Toaster = ({ ...props }: ToasterProps) => {
           "--normal-text": "var(--popover-foreground)",
           "--normal-border": "var(--border)",
           "--border-radius": "var(--radius)",
+          // success = hijau (primary), error = merah (destructive), warning = kuning —
+          // dicampur tipis (color-mix) di atas --popover biar otomatis pas di light & dark mode.
+          "--success-bg": "color-mix(in oklab, var(--primary) 12%, var(--popover))",
+          "--success-text": "var(--primary)",
+          "--success-border": "color-mix(in oklab, var(--primary) 35%, var(--popover))",
+          "--error-bg": "color-mix(in oklab, var(--destructive) 12%, var(--popover))",
+          "--error-text": "var(--destructive)",
+          "--error-border": "color-mix(in oklab, var(--destructive) 35%, var(--popover))",
+          "--warning-bg": "color-mix(in oklab, var(--warning) 15%, var(--popover))",
+          "--warning-text": "var(--warning)",
+          "--warning-border": "color-mix(in oklab, var(--warning) 40%, var(--popover))",
         } as React.CSSProperties
       }
       toastOptions={{

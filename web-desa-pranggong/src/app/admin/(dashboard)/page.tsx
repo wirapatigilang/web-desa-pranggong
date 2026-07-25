@@ -1,92 +1,212 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import ConfirmDeleteButton from "@/components/admin/confirm-delete-button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
-import { deletePost } from "@/lib/actions/posts";
+import { getVillageProfile } from "@/lib/village-profile";
 
-export default async function AdminPostsPage() {
-  const posts = await prisma.post.findMany({
-    orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
-  });
+const PLACEHOLDER_MARKER = "belum diperbarui";
+
+type ActivityItem = {
+  id: string;
+  label: string;
+  type: "Berita" | "Pengumuman" | "UMKM";
+  updatedAt: Date;
+  editHref: string;
+};
+
+export default async function AdminDashboardPage() {
+  const [beritaCount, pengumumanCount, umkmCount, recentPosts, recentUmkm, profile] =
+    await Promise.all([
+      prisma.post.count({ where: { type: "berita" } }),
+      prisma.post.count({ where: { type: "pengumuman" } }),
+      prisma.umkm.count(),
+      prisma.post.findMany({
+        orderBy: { updatedAt: "desc" },
+        take: 5,
+      }),
+      prisma.umkm.findMany({
+        orderBy: { updatedAt: "desc" },
+        take: 5,
+      }),
+      getVillageProfile(),
+    ]);
+
+  const demographicFields = [
+    profile.area,
+    profile.population,
+    profile.households,
+    profile.hamlets,
+    profile.boundaryNorth,
+    profile.boundarySouth,
+    profile.boundaryEast,
+    profile.boundaryWest,
+  ];
+  const demographicsComplete = demographicFields.every(
+    (value) => !value.toLowerCase().includes(PLACEHOLDER_MARKER),
+  );
+  const orgStructureComplete =
+    profile.orgStructure.length > 0 &&
+    profile.orgStructure.every((entry) => entry.name.trim().length > 0);
+
+  const stats = [
+    { label: "Berita", value: beritaCount, href: "/admin/posts" },
+    { label: "Pengumuman", value: pengumumanCount, href: "/admin/posts" },
+    { label: "UMKM Terdaftar", value: umkmCount, href: "/admin/umkm" },
+    {
+      label: "Data Wilayah",
+      value: demographicsComplete ? "Lengkap" : "Belum lengkap",
+      href: "/admin/profil",
+    },
+  ];
+
+  const checklist = [
+    {
+      done: demographicsComplete,
+      label: "Data geografis & demografis (luas, penduduk, KK, dusun, batas wilayah)",
+      href: "/admin/profil",
+    },
+    {
+      done: orgStructureComplete,
+      label: "Nama pejabat di struktur organisasi",
+      href: "/admin/profil",
+    },
+    {
+      done: umkmCount > 0,
+      label: "Data UMKM warga",
+      href: "/admin/umkm",
+    },
+    {
+      done: beritaCount > 0,
+      label: "Minimal satu berita",
+      href: "/admin/posts/new",
+    },
+    {
+      done: pengumumanCount > 0,
+      label: "Minimal satu pengumuman",
+      href: "/admin/posts/new",
+    },
+  ];
+  const pendingChecklist = checklist.filter((item) => !item.done);
+
+  const activity: ActivityItem[] = [
+    ...recentPosts.map((post) => ({
+      id: post.id,
+      label: post.title,
+      type: post.type === "berita" ? ("Berita" as const) : ("Pengumuman" as const),
+      updatedAt: post.updatedAt,
+      editHref: `/admin/posts/${post.id}/edit`,
+    })),
+    ...recentUmkm.map((item) => ({
+      id: item.id,
+      label: item.name,
+      type: "UMKM" as const,
+      updatedAt: item.updatedAt,
+      editHref: `/admin/umkm/${item.id}/edit`,
+    })),
+  ]
+    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+    .slice(0, 5);
 
   return (
-    <div>
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Berita &amp; Pengumuman</h1>
-          <p className="text-sm text-muted-foreground">
-            Kelola konten yang tampil di halaman publik.
-          </p>
-        </div>
-        <Button asChild>
-          <Link href="/admin/posts/new">+ Tambah</Link>
-        </Button>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <p className="text-sm text-muted-foreground">
+          Ringkasan konten website Desa Pranggong.
+        </p>
       </div>
 
-      <div className="mt-6 rounded-lg border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Judul</TableHead>
-              <TableHead>Kategori</TableHead>
-              <TableHead>Tanggal</TableHead>
-              <TableHead className="text-right">Aksi</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {posts.map((post) => (
-              <TableRow key={post.id}>
-                <TableCell className="font-medium">
-                  {post.title}
-                  {post.pinned && (
-                    <Badge variant="secondary" className="ml-2">
-                      Disematkan
-                    </Badge>
-                  )}
-                </TableCell>
-                <TableCell className="capitalize">{post.type}</TableCell>
-                <TableCell>
-                  {post.createdAt.toLocaleDateString("id-ID", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link href={`/admin/posts/${post.id}/edit`}>Edit</Link>
-                  </Button>
-                  <ConfirmDeleteButton
-                    title={`Hapus "${post.title}"?`}
-                    description="Tindakan ini tidak bisa dibatalkan. Konten akan langsung hilang dari website publik."
-                    successMessage={`"${post.title}" dihapus.`}
-                    onConfirm={deletePost.bind(null, post.id)}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-            {posts.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="py-8 text-center text-sm text-muted-foreground"
-                >
-                  Belum ada konten. Klik &ldquo;+ Tambah&rdquo; untuk membuat
-                  yang pertama.
-                </TableCell>
-              </TableRow>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <Link key={stat.label} href={stat.href}>
+            <Card className="transition-colors hover:border-primary/40">
+              <CardHeader>
+                <CardTitle className="text-sm font-normal text-muted-foreground">
+                  {stat.label}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-semibold">{stat.value}</p>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+      </div>
+
+      <div>
+        <h2 className="text-sm font-semibold text-muted-foreground">
+          Aksi Cepat
+        </h2>
+        <div className="mt-3 flex flex-wrap gap-3">
+          <Button asChild>
+            <Link href="/admin/posts/new">+ Berita / Pengumuman</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/admin/umkm/new">+ UMKM</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/admin/profil">Edit Profil Desa</Link>
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Kelengkapan Data</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {pendingChecklist.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Semua data dasar sudah terisi.
+              </p>
+            ) : (
+              <ul className="space-y-3">
+                {pendingChecklist.map((item) => (
+                  <li key={item.label} className="flex items-start gap-2 text-sm">
+                    <span
+                      aria-hidden="true"
+                      className="mt-1 h-2 w-2 shrink-0 rounded-full bg-amber-500"
+                    />
+                    <Link href={item.href} className="hover:underline">
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             )}
-          </TableBody>
-        </Table>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Aktivitas Terbaru</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {activity.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Belum ada aktivitas.
+              </p>
+            ) : (
+              <ul className="space-y-3">
+                {activity.map((item) => (
+                  <li key={`${item.type}-${item.id}`}>
+                    <Link
+                      href={item.editHref}
+                      className="flex items-center justify-between gap-3 text-sm hover:underline"
+                    >
+                      <span className="truncate">{item.label}</span>
+                      <Badge variant="secondary" className="shrink-0">
+                        {item.type}
+                      </Badge>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

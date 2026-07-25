@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
+import SidebarNav from "@/components/admin/sidebar-nav";
 import SignOutButton from "@/components/admin/sign-out-button";
 import ThemeToggle from "@/components/admin/theme-toggle";
 
@@ -15,26 +16,7 @@ export default async function DashboardLayout({
     <div className="flex min-h-screen">
       <aside className="hidden w-56 shrink-0 border-r bg-card px-4 py-6 sm:block">
         <p className="font-semibold">Admin Desa</p>
-        <nav className="mt-6 space-y-1 text-sm">
-          <Link
-            href="/admin"
-            className="block rounded-md px-3 py-2 hover:bg-accent hover:text-accent-foreground"
-          >
-            Berita &amp; Pengumuman
-          </Link>
-          <Link
-            href="/admin/profil"
-            className="block rounded-md px-3 py-2 hover:bg-accent hover:text-accent-foreground"
-          >
-            Profil Desa
-          </Link>
-          <Link
-            href="/admin/umkm"
-            className="block rounded-md px-3 py-2 hover:bg-accent hover:text-accent-foreground"
-          >
-            UMKM
-          </Link>
-        </nav>
+        <SidebarNav />
       </aside>
 
       <div className="flex-1">

@@ -34,7 +34,7 @@ export default function PostForm({
   useEffect(() => {
     if (state.success) {
       toast.success("Perubahan berhasil disimpan.");
-      router.push("/admin");
+      router.push("/admin/posts");
     } else if (state.error) {
       toast.error(state.error);
     }
@@ -105,7 +105,7 @@ export default function PostForm({
           {pending ? "Menyimpan…" : submitLabel}
         </Button>
         <Button type="button" variant="outline" asChild>
-          <Link href="/admin">Batal</Link>
+          <Link href="/admin/posts">Batal</Link>
         </Button>
       </div>
     </form>
