@@ -16,6 +16,7 @@
 - Tahap berikutnya: sisa Tahap 3 (layanan publik/potensi wisata/galeri), ATAU poles Tahap 5 (upload gambar), ATAU isi foto asli Rocket Stove menggantikan placeholder — tunggu arahan user.
 - **Login pertama kali? Baca log 2026-07-16 "Fix: login admin gagal" di bawah dulu** kalau login tidak jalan — ada gotcha soal env var yang gampang terulang.
 - **PENTING sebelum deploy**: ganti `ADMIN_EMAIL`/`ADMIN_PASSWORD` di `.env` (masih nilai contoh) dan `BETTER_AUTH_SECRET`, lalu jalankan `prisma db seed` di environment produksi. Tidak ada form pendaftaran publik by design — akun admin cuma bisa dibuat lewat seed script.
+- **SUDAH DEPLOY ke production** (2026-07-16): `https://web-desa-pranggong-preview.vercel.app` (project Vercel: `web-desa-pranggong-preview`, DB: Neon Postgres). Baca log 2026-07-16 "Deploy pertama ke Vercel" sebelum utak-atik apa pun terkait Vercel/deployment — ada 3 masalah terpisah yang bertumpuk (Root Directory, Framework Preset ke-set "Other", webhook GitHub belum jalan). **Webhook auto-deploy dari git push masih belum diperbaiki** — untuk sekarang deploy manual pakai `vercel --prod` dari root repo (bukan folder project).
 
 ## Arsitektur / Konvensi Project
 
@@ -52,6 +53,46 @@
 | `/admin/posts/new`, `/admin/posts/[id]/edit` | Selesai — form create/edit (shadcn) |
 
 ## Log Pengerjaan
+
+### 2026-07-16 — Deploy pertama ke Vercel: troubleshooting berlapis (404 NOT_FOUND)
+Sesi panjang debugging deploy production yang terus 404. Ternyata BUKAN satu masalah, tapi 3 masalah terpisah yang bertumpuk. Dicatat detail supaya tidak perlu re-diagnose dari nol.
+
+**Konteks penting**: struktur repo ini **bertingkat** —
+```
+web-desa-pranggong/              <- root repo git (remote origin)
+  web-desa-pranggong/            <- root project Next.js, package.json ada di sini
+```
+Project Vercel yang benar-benar dipakai: **`web-desa-pranggong-preview`** (bukan nama yang match persis nama folder — cek dulu di dashboard/​`vercel project ls` kalau ragu, jangan asumsi dari nama domain di `.env`). Root Directory project di Vercel di-set `web-desa-pranggong` (folder dalam).
+
+**Masalah #1 — Root Directory salah** (sudah dibahas & fix di sesi sebelumnya, dicatat ulang di sini biar lengkap): Vercel defaultnya cari `package.json` di root repo. Karena repo bertingkat, harus di-set manual ke `web-desa-pranggong` di Settings → General → Root Directory.
+
+**Masalah #2 — Webhook GitHub → Vercel tidak jalan**: push commit baru ke `main`/`production` branch di GitHub tidak memicu deployment baru sama sekali di Vercel (commit terbaru tidak muncul di tab Deployments). Root cause belum ketemu persis (kemungkinan GitHub App permission/koneksi putus) — **workaround untuk sekarang: deploy manual pakai Vercel CLI** (lihat instruksi di bawah), sementara isu webhook-nya sendiri belum diperbaiki. **TODO sesi depan**: cek Settings → Git → Connected Git Repository di project (bukan repo!) yang benar (`web-desa-pranggong-preview`), coba disconnect+reconnect. Juga cek GitHub repo Settings → Webhooks untuk delivery log.
+
+**Masalah #3 — Framework Preset ke-set "Other", bukan "Next.js"** — INI AKAR MASALAH 404-nya. Build selalu sukses (`next build` jalan normal, semua route ter-generate), tapi Vercel tidak tahu cara menyajikan output-nya karena Framework Preset di project settings ke-set "Other" (Output Directory: `public` atau `.`, bukan format khusus Next.js). Akibatnya SEMUA request ke domain production dapat `404 NOT_FOUND` dari edge Vercel (`x-vercel-error: NOT_FOUND`), padahal deployment-nya sendiri "Ready". **Fix: Settings → General → Framework Preset → ganti ke "Next.js"**, lalu redeploy. Kemungkinan ini kejadian dari awal project dibuat sebelum Root Directory benar, jadi auto-detect Next.js gagal dan Vercel default ke "Other" — dan tidak pernah dikoreksi manual setelah Root Directory diperbaiki.
+- **Cara bedakan gejala #3 dari masalah lain**: kalau `vercel inspect <url>` bilang deployment "Ready" dan alias-nya benar, TAPI curl ke domain publiknya tetap `NOT_FOUND` polos (bukan error dari halaman Next.js kita) — cek Framework Preset dulu sebelum curiga ke hal lain. Command: `vercel project inspect <project-name>`, lihat bagian "Framework Settings".
+
+**Sempat juga ketemu (bukan penyebab final, tapi sempat menyesatkan arah debug)**: Vercel Deployment Protection (Vercel Authentication/SSO) sempat aktif di project ini, bikin akses publik ke deployment URL langsung (bukan alias) di-redirect ke `vercel.com/sso-api`. Ini beda gejala dari masalah #3 (redirect 302, bukan 404 polos). User sudah matikan ini juga. Untuk situs pemerintah desa yang publik, Deployment Protection harus OFF untuk environment Production.
+
+**Insiden kecil selama troubleshooting**: pas coba `vercel link --yes` dari folder project (bukan dari root repo), CLI malah **membuat project baru kosong** bernama `web-desa-pranggong` (bukan link ke `web-desa-pranggong-preview` yang sudah ada) — karena `--yes` otomatis pakai default tanpa konfirmasi. Sudah dihapus (`vercel project rm`). **Pelajaran: selalu pakai `vercel link --project <nama-persis> --scope <team>` secara eksplisit**, jangan `--yes` polos, kalau project-nya sudah ada — biar tidak ke-duplikat.
+
+**Cara deploy manual (dipakai sebagai workaround masalah #2, dan berguna kapan pun butuh deploy cepat tanpa nunggu git push)**:
+```bash
+# WAJIB dari root repo (folder luar), bukan dari folder project Next.js —
+# karena Root Directory project sudah di-set "web-desa-pranggong" dan itu
+# otomatis ditambahkan di atas working directory CLI.
+cd /Users/gilangwirapati/Documents/development/web-desa-pranggong
+vercel --prod
+```
+Kalau `.vercel/project.json` belum ada / hilang, link ulang dulu:
+```bash
+vercel link --project web-desa-pranggong-preview --scope wirapatigilangs-projects --yes
+```
+
+**Verifikasi akhir**: `curl` ke domain production (`https://web-desa-pranggong-preview.vercel.app/`, `/profil-desa`, `/admin/login`) semua 200, konten "Desa Pranggong" muncul di homepage. Situs live dan bisa diakses publik.
+
+**Belum selesai**: 
+- Webhook GitHub tetap belum diperbaiki — deploy otomatis dari `git push` masih belum bisa diandalkan, HARUS `vercel --prod` manual untuk sekarang.
+- Env vars production (`DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`) sudah ke-set di Vercel dan terhubung ke Postgres Neon — tapi belum dikonfirmasi apakah `ADMIN_PASSWORD` production sudah diganti dari nilai contoh (`ubah-password-ini`) atau masih sama. **Cek ini sebelum umumkan situs ke publik.**
 
 ### 2026-07-16 — Dark mode untuk halaman admin
 - User minta dark mode khusus untuk `/admin` (situs publik tidak diminta, dan memang tidak cocok — palet moss/paper/gold sudah dirancang sebagai identitas resmi tunggal, bukan sistem light/dark).
