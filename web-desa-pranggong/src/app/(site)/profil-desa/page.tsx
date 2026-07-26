@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Eyebrow from "@/components/ui/eyebrow";
-import Reveal from "@/components/motion/reveal";
+import Reveal, { RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { siteConfig } from "@/lib/site-config";
 import { getVillageProfile } from "@/lib/village-profile";
 
@@ -92,9 +92,9 @@ export default async function ProfilDesaPage() {
           </h2>
         </Reveal>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {demographicStats.map((stat, index) => (
-            <Reveal key={stat.label} delay={index * 0.08}>
+        <RevealGroup className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {demographicStats.map((stat) => (
+            <RevealItem key={stat.label}>
               <div className="border border-moss-900/10 p-5">
                 <p className="text-xs font-semibold uppercase tracking-wide text-gold-600">
                   {stat.label}
@@ -103,27 +103,29 @@ export default async function ProfilDesaPage() {
                   {stat.value}
                 </p>
               </div>
-            </Reveal>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
 
         <h3 className="mt-10 font-display text-lg font-semibold text-ink-900">
           Batas Wilayah
         </h3>
-        <dl className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {boundaries.map((boundary, index) => (
-            <Reveal key={boundary.label} delay={index * 0.08}>
-              <div className="border border-moss-900/10 p-5">
-                <dt className="text-xs font-semibold uppercase tracking-wide text-gold-600">
-                  {boundary.label}
-                </dt>
-                <dd className="mt-2 text-sm text-ink-900/70">
-                  {boundary.value}
-                </dd>
-              </div>
-            </Reveal>
-          ))}
-        </dl>
+        <RevealGroup>
+          <dl className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {boundaries.map((boundary) => (
+              <RevealItem key={boundary.label}>
+                <div className="border border-moss-900/10 p-5">
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-gold-600">
+                    {boundary.label}
+                  </dt>
+                  <dd className="mt-2 text-sm text-ink-900/70">
+                    {boundary.value}
+                  </dd>
+                </div>
+              </RevealItem>
+            ))}
+          </dl>
+        </RevealGroup>
       </section>
 
       {/* Struktur Organisasi */}

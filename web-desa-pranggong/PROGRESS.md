@@ -18,7 +18,7 @@
 - **PENTING sebelum deploy**: ganti `ADMIN_EMAIL`/`ADMIN_PASSWORD` di `.env` (masih nilai contoh) dan `BETTER_AUTH_SECRET`, lalu jalankan `prisma db seed` di environment produksi. Tidak ada form pendaftaran publik by design — akun admin cuma bisa dibuat lewat seed script.
 - **SUDAH DEPLOY ke production** (2026-07-16): `https://web-desa-pranggong-preview.vercel.app` (project Vercel: `web-desa-pranggong-preview`, DB: Neon Postgres). Baca log 2026-07-16 "Deploy pertama ke Vercel" sebelum utak-atik apa pun terkait Vercel/deployment — ada 3 masalah terpisah yang bertumpuk (Root Directory, Framework Preset ke-set "Other", webhook GitHub belum jalan). **Webhook auto-deploy dari git push masih belum diperbaiki** — untuk sekarang deploy manual pakai `vercel --prod` dari root repo (bukan folder project).
 - **Redesign ke-3 (2026-07-25): "Village Community System"** — identitas visual sebelumnya ("resmi pemerintah" moss/gold/kop-surat) DIGANTI TOTAL berdasarkan referensi desain yang dikasih user (design system sheet + mockup landing page). Palet hijau cerah (#1B5E20), font Montserrat+Inter, serba rounded-2xl, hero terang (bukan gelap), section baru "Layanan Publik". Detail lengkap di log 2026-07-25 di bawah. **Kalau bingung kenapa token bernama "gold-*" isinya hijau, atau "paper-*" isinya putih/abu — itu peninggalan nama dari redesign sebelumnya, sengaja dipertahankan biar tidak perlu ubah puluhan file, cuma nilai hex-nya yang diganti. Baca komentar di `globals.css`.**
-- **Animasi (2026-07-25)**: seluruh situs publik (bukan `/admin`) sekarang pakai `framer-motion` untuk scroll-reveal + entrance animation. Komponen reusable `src/components/motion/reveal.tsx` — dipakai hampir di semua section/card. Detail di log 2026-07-25 "Animasi" di bawah.
+- **Animasi (2026-07-25)**: seluruh situs publik (bukan `/admin`) sekarang pakai `framer-motion` untuk scroll-reveal + entrance animation. Komponen reusable `src/components/motion/reveal.tsx` — dipakai hampir di semua section/card. **Diupgrade (2026-07-25) jadi stagger-group** (`RevealGroup`/`RevealItem`, lihat log "Animasi lebih kompleks" di bawah) + semua tanda panah (→/↑) di tombol/link sekarang animasi hover lewat komponen `src/components/ui/hover-arrow.tsx`.
 
 ## Arsitektur / Konvensi Project
 
@@ -58,6 +58,18 @@
 | `/admin/posts/new`, `/admin/posts/[id]/edit` | Selesai — form create/edit (shadcn) |
 
 ## Log Pengerjaan
+
+### 2026-07-25 — Animasi lebih kompleks (stagger group) + hover arrow di semua tombol panah
+User minta animasi situs publik "lebih kompleks" dan setiap tanda panah (→/↑) di tombol/link diberi animasi hover.
+
+- `src/components/motion/reveal.tsx`: `Reveal` (default export) TIDAK diubah — masih dipakai apa adanya di banyak file. Ditambah 2 named export baru:
+  - `RevealGroup` — container `motion.div` dengan `variants` stagger (`staggerChildren: 0.09, delayChildren: 0.05`), trigger `whileInView` sekali. Dipakai menggantikan `<div className="grid ...">` pembungkus grid kartu.
+  - `RevealItem` — dipakai sebagai child langsung `RevealGroup` (mewarisi state `hidden`/`visible` dari context Framer Motion — TIDAK punya `initial`/`whileInView` sendiri), tambah `whileHover={{ y: -4 }}` (efek terangkat tipis).
+  - Pola lama `{items.map((item, index) => <Reveal key={...} delay={index * 0.1}>...)}` (delay manual per index) sudah diganti pola baru `<RevealGroup className="grid ...">{items.map((item) => <RevealItem key={...}>...)}</RevealGroup>` di semua grid kartu situs publik: homepage (`page.tsx` — stats, layanan publik, program kerja, pengumuman, berita), `profil-desa/page.tsx` (data wilayah, batas wilayah), `kontak/page.tsx` (4 kartu kontak), `program-kerja/rocket-stove/page.tsx` (manfaat, dokumentasi proses, sosialisasi, galeri sebelum-sesudah).
+  - **Gotcha semantic HTML**: di `profil-desa` & `kontak`, grid batas wilayah/kontak pakai tag `<dl>` asli (`dt`/`dd`). `RevealGroup` render `motion.div`, jadi TIDAK bisa langsung gantikan tag `<dl>` (nanti tag `<dl>`-nya hilang). Solusi: `<RevealGroup>` jadi pembungkus LUAR, `<dl className="grid ...">` tetap ada di dalamnya sebagai anak biasa (bukan motion component) — variant Framer Motion tetap mengalir ke `RevealItem` di dalam `<dl>` lewat React Context, tidak peduli ada tag HTML biasa di antaranya.
+- `src/components/ui/hover-arrow.tsx` (baru) — komponen `HoverArrow` bungkus ikon `ArrowRight`/`ArrowUp` dari `lucide-react`, animasi pakai CSS murni (`group-hover:translate-x-1` / `group-hover:-translate-y-1`), BUKAN Framer Motion — sengaja supaya bisa dipakai langsung di Server Component tanpa `"use client"`. Parent (`Link`/`button`) WAJIB punya class `group`.
+- Semua instance teks panah mentah (`→`/`↑`) di situs publik sudah diganti `<HoverArrow />` (6 lokasi: homepage hero CTA, kartu "Info selengkapnya", kartu Program Kerja, `rocket-stove/page.tsx` tombol "Buka Peta Desa", `village-explorer.tsx` tombol "Lihat di peta" arah `up`, `village-map.tsx` popup peta "Lihat halaman program"). `village-explorer.tsx` & `village-map.tsx` sudah `"use client"` dari awal jadi tidak ada masalah RSC boundary.
+- Verifikasi: `npm run lint` bersih, `npm run build` sukses (semua route ter-generate), smoke-test curl semua route publik yang diubah (`/`, `/profil-desa`, `/kontak`, `/peta-desa`, `/program-kerja/rocket-stove`) → semua 200, konten render normal (bukan error page).
 
 ### 2026-07-25 — Active state di sidebar admin
 Sidebar admin dari awal tidak pernah ada penanda halaman aktif (beda dengan Navbar situs publik yang sudah punya sejak awal). User minta ditambahkan.

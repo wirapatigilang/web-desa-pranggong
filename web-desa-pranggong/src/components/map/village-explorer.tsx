@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import HoverArrow from "@/components/ui/hover-arrow";
 import VillageMapLoader from "@/components/map/village-map-loader";
 import {
   categoryColors,
@@ -158,9 +159,10 @@ export default function VillageExplorer({
                   <button
                     type="button"
                     onClick={() => focusLocation(mapLocationId)}
-                    className="mt-4 text-sm font-semibold text-moss-600 hover:underline"
+                    className="group mt-4 inline-flex items-center gap-1 text-sm font-semibold text-moss-600 hover:underline"
                   >
-                    Lihat di peta ↑
+                    Lihat di peta
+                    <HoverArrow direction="up" />
                   </button>
                 ) : (
                   <p className="mt-4 text-xs italic text-ink-900/40">

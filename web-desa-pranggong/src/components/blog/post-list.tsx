@@ -48,13 +48,16 @@ export default function PostList({ posts }: { posts: Post[] }) {
       {filtered.length > 0 ? (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((post) => (
-            <article key={post.slug} className="border border-moss-900/10 p-7">
-              <div className="flex items-center gap-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-gold-600">
+            <article
+              key={post.slug}
+              className="rounded-2xl border border-black/5 bg-paper-50 p-7 shadow-sm shadow-black/[0.02]"
+            >
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-gold-600/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-gold-600">
                   {postTypeLabels[post.type]}
-                </p>
+                </span>
                 {post.pinned && (
-                  <span className="text-xs font-semibold uppercase tracking-wide text-ink-900/40">
+                  <span className="rounded-full bg-ink-900/5 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-ink-900/40">
                     Disematkan
                   </span>
                 )}

@@ -5,6 +5,7 @@ import L from "leaflet";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import HoverArrow from "@/components/ui/hover-arrow";
 import {
   categoryColors,
   categoryLabels,
@@ -106,9 +107,10 @@ export default function VillageMap({
               {location.href && (
                 <Link
                   href={location.href}
-                  className="mt-2 inline-block text-xs font-medium text-moss-600 hover:underline"
+                  className="group mt-2 inline-flex items-center gap-1 text-xs font-medium text-moss-600 hover:underline"
                 >
-                  Lihat halaman program →
+                  Lihat halaman program
+                  <HoverArrow />
                 </Link>
               )}
             </Popup>

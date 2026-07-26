@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Eyebrow from "@/components/ui/eyebrow";
-import Reveal from "@/components/motion/reveal";
+import HoverArrow from "@/components/ui/hover-arrow";
+import Reveal, { RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { siteConfig } from "@/lib/site-config";
 import { prisma } from "@/lib/prisma";
 import { getVillageProfile } from "@/lib/village-profile";
@@ -137,9 +138,10 @@ export default async function Home() {
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/kontak"
-                className="rounded-full bg-moss-600 px-6 py-3 text-sm font-semibold text-paper-50 transition-colors hover:bg-moss-500"
+                className="group inline-flex items-center gap-1.5 rounded-full bg-moss-600 px-6 py-3 text-sm font-semibold text-paper-50 transition-colors hover:bg-moss-500"
               >
-                Layanan Publik →
+                Layanan Publik
+                <HoverArrow />
               </Link>
               <Link
                 href="/profil-desa"
@@ -150,9 +152,9 @@ export default async function Home() {
             </div>
           </Reveal>
 
-          <div className="mx-auto mt-14 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
-            {stats.map((stat, index) => (
-              <Reveal key={stat.label} delay={0.15 + index * 0.08}>
+          <RevealGroup className="mx-auto mt-14 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+            {stats.map((stat) => (
+              <RevealItem key={stat.label}>
                 <div className="rounded-2xl border border-black/5 bg-paper-50 px-4 py-5 shadow-sm shadow-black/[0.03]">
                   <p className="font-display text-xl font-bold text-moss-600 sm:text-2xl">
                     {stat.value}
@@ -161,9 +163,9 @@ export default async function Home() {
                     {stat.label}
                   </p>
                 </div>
-              </Reveal>
+              </RevealItem>
             ))}
-          </div>
+          </RevealGroup>
         </div>
       </section>
 
@@ -218,9 +220,9 @@ export default async function Home() {
             </p>
           </Reveal>
 
-          <div className="mt-10 grid gap-6 text-left sm:grid-cols-3">
-            {layananPublik.map((item, index) => (
-              <Reveal key={item.title} delay={index * 0.1}>
+          <RevealGroup className="mt-10 grid gap-6 text-left sm:grid-cols-3">
+            {layananPublik.map((item) => (
+              <RevealItem key={item.title}>
                 <div className="rounded-2xl border border-black/5 bg-paper-50 p-6">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-moss-600/10 text-moss-600">
                     <svg
@@ -244,14 +246,15 @@ export default async function Home() {
                   </p>
                   <Link
                     href="/kontak"
-                    className="mt-4 inline-block text-sm font-semibold text-moss-600 hover:underline"
+                    className="group mt-4 inline-flex items-center gap-1 text-sm font-semibold text-moss-600 hover:underline"
                   >
-                    Info selengkapnya →
+                    Info selengkapnya
+                    <HoverArrow />
                   </Link>
                 </div>
-              </Reveal>
+              </RevealItem>
             ))}
-          </div>
+          </RevealGroup>
         </div>
       </section>
 
@@ -265,9 +268,9 @@ export default async function Home() {
             </h2>
           </Reveal>
 
-          <div className="mt-10 grid gap-6 sm:grid-cols-2">
-            {programs.map((program, index) => (
-              <Reveal key={program.href} delay={index * 0.1}>
+          <RevealGroup className="mt-10 grid gap-6 sm:grid-cols-2">
+            {programs.map((program) => (
+              <RevealItem key={program.href}>
                 <Link
                   href={program.href}
                   className="group block rounded-2xl border border-black/5 bg-paper-100 p-7 transition-colors hover:border-moss-600/30 hover:bg-moss-600/5"
@@ -290,14 +293,12 @@ export default async function Home() {
                   </p>
                   <span className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-moss-600">
                     Selengkapnya
-                    <span className="transition-transform group-hover:translate-x-1">
-                      →
-                    </span>
+                    <HoverArrow />
                   </span>
                 </Link>
-              </Reveal>
+              </RevealItem>
             ))}
-          </div>
+          </RevealGroup>
         </div>
       </section>
 
@@ -322,13 +323,13 @@ export default async function Home() {
           </Reveal>
 
           {pengumuman.length > 0 ? (
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {pengumuman.map((post, index) => (
-                <Reveal key={post.slug} delay={index * 0.1}>
+            <RevealGroup className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {pengumuman.map((post) => (
+                <RevealItem key={post.slug}>
                   <PostCard post={post} />
-                </Reveal>
+                </RevealItem>
               ))}
-            </div>
+            </RevealGroup>
           ) : (
             <p className="mt-8 text-sm text-ink-900/50">
               Belum ada pengumuman saat ini.
@@ -358,13 +359,13 @@ export default async function Home() {
           </Reveal>
 
           {berita.length > 0 ? (
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {berita.map((post, index) => (
-                <Reveal key={post.slug} delay={index * 0.1}>
+            <RevealGroup className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {berita.map((post) => (
+                <RevealItem key={post.slug}>
                   <PostCard post={post} />
-                </Reveal>
+                </RevealItem>
               ))}
-            </div>
+            </RevealGroup>
           ) : (
             <p className="mt-8 text-sm text-ink-900/50">
               Belum ada berita saat ini.

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Eyebrow from "@/components/ui/eyebrow";
 import ImagePlaceholder from "@/components/ui/image-placeholder";
-import Reveal from "@/components/motion/reveal";
+import HoverArrow from "@/components/ui/hover-arrow";
+import Reveal, { RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { contactInfo } from "@/lib/site-config";
 
 export const metadata: Metadata = {
@@ -87,7 +88,7 @@ export default function RocketStovePage() {
               Kenapa Program Ini Dijalankan
             </h2>
           </Reveal>
-          <ul className="mt-6 grid gap-6 sm:grid-cols-3">
+          <RevealGroup className="mt-6 grid gap-6 sm:grid-cols-3">
             {[
               {
                 title: "Hemat Bahan Bakar",
@@ -104,19 +105,19 @@ export default function RocketStovePage() {
                 description:
                   "Dibuat dari bahan sederhana dan terjangkau, sehingga warga bisa membuat atau meniru desainnya secara mandiri.",
               },
-            ].map((benefit, index) => (
-              <Reveal key={benefit.title} delay={index * 0.1}>
-                <li className="border border-moss-900/10 bg-paper-50 p-5">
+            ].map((benefit) => (
+              <RevealItem key={benefit.title}>
+                <div className="rounded-2xl border border-black/5 bg-paper-50 p-5 shadow-sm shadow-black/[0.02]">
                   <p className="font-display text-lg font-semibold text-ink-900">
                     {benefit.title}
                   </p>
                   <p className="mt-2 text-sm text-ink-900/70">
                     {benefit.description}
                   </p>
-                </li>
-              </Reveal>
+                </div>
+              </RevealItem>
             ))}
-          </ul>
+          </RevealGroup>
         </div>
       </section>
 
@@ -128,9 +129,9 @@ export default function RocketStovePage() {
             Proses Pembuatan &amp; Instalasi
           </h2>
         </Reveal>
-        <div className="mt-6 grid gap-6 sm:grid-cols-3">
-          {buildSteps.map((step, index) => (
-            <Reveal key={step.title} delay={index * 0.1}>
+        <RevealGroup className="mt-6 grid gap-6 sm:grid-cols-3">
+          {buildSteps.map((step) => (
+            <RevealItem key={step.title}>
               <div>
                 <ImagePlaceholder label={step.title} />
                 <p className="mt-3 font-display text-base font-semibold text-ink-900">
@@ -140,9 +141,9 @@ export default function RocketStovePage() {
                   {step.description}
                 </p>
               </div>
-            </Reveal>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
         <p className="mt-4 text-xs text-ink-900/50">
           Foto dokumentasi asli menyusul dari tim KKN — placeholder di atas
           menandai slot yang akan diisi.
@@ -206,9 +207,9 @@ export default function RocketStovePage() {
             Sosialisasi &amp; Pelatihan Warga
           </h2>
         </Reveal>
-        <div className="mt-6 grid gap-6 sm:grid-cols-2">
-          {socialization.map((item, index) => (
-            <Reveal key={item.title} delay={index * 0.1}>
+        <RevealGroup className="mt-6 grid gap-6 sm:grid-cols-2">
+          {socialization.map((item) => (
+            <RevealItem key={item.title}>
               <div>
                 <ImagePlaceholder label={item.title} aspect="aspect-video" />
                 <p className="mt-3 font-display text-base font-semibold text-ink-900">
@@ -218,9 +219,9 @@ export default function RocketStovePage() {
                   {item.description}
                 </p>
               </div>
-            </Reveal>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
       </section>
 
       {/* Galeri sebelum-sesudah */}
@@ -232,8 +233,8 @@ export default function RocketStovePage() {
               Sebelum &amp; Sesudah
             </h2>
           </Reveal>
-          <div className="mt-6 grid gap-6 sm:grid-cols-2">
-            <Reveal>
+          <RevealGroup className="mt-6 grid gap-6 sm:grid-cols-2">
+            <RevealItem>
               <div>
                 <ImagePlaceholder
                   label="Kondisi dapur sebelum"
@@ -243,8 +244,8 @@ export default function RocketStovePage() {
                   Sebelum
                 </p>
               </div>
-            </Reveal>
-            <Reveal delay={0.1}>
+            </RevealItem>
+            <RevealItem>
               <div>
                 <ImagePlaceholder
                   label="Kondisi dapur sesudah pakai Rocket Stove"
@@ -254,8 +255,8 @@ export default function RocketStovePage() {
                   Sesudah
                 </p>
               </div>
-            </Reveal>
-          </div>
+            </RevealItem>
+          </RevealGroup>
         </div>
       </section>
 
@@ -287,9 +288,10 @@ export default function RocketStovePage() {
             </p>
             <Link
               href="/peta-desa"
-              className="mt-4 inline-block rounded-md bg-moss-600 px-5 py-2.5 text-sm font-semibold text-paper-50 transition-colors hover:bg-moss-500"
+              className="group mt-4 inline-flex items-center gap-1.5 rounded-md bg-moss-600 px-5 py-2.5 text-sm font-semibold text-paper-50 transition-colors hover:bg-moss-500"
             >
-              Buka Peta Desa →
+              Buka Peta Desa
+              <HoverArrow />
             </Link>
           </Reveal>
         </div>

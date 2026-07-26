@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Eyebrow from "@/components/ui/eyebrow";
-import Reveal from "@/components/motion/reveal";
+import Reveal, { RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { contactInfo, siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
@@ -27,18 +27,20 @@ export default function KontakPage() {
         </p>
       </Reveal>
 
-      <dl className="mt-8 grid gap-6 sm:grid-cols-2">
-        {items.map((item, index) => (
-          <Reveal key={item.label} delay={index * 0.08}>
-            <div className="border border-moss-900/10 p-6">
-              <dt className="text-sm font-semibold uppercase tracking-wide text-gold-600">
-                {item.label}
-              </dt>
-              <dd className="mt-2 text-ink-900/80">{item.value}</dd>
-            </div>
-          </Reveal>
-        ))}
-      </dl>
+      <RevealGroup>
+        <dl className="mt-8 grid gap-6 sm:grid-cols-2">
+          {items.map((item) => (
+            <RevealItem key={item.label}>
+              <div className="rounded-2xl border border-black/5 bg-paper-50 p-6 shadow-sm shadow-black/[0.02]">
+                <dt className="text-sm font-semibold uppercase tracking-wide text-gold-600">
+                  {item.label}
+                </dt>
+                <dd className="mt-2 text-ink-900/80">{item.value}</dd>
+              </div>
+            </RevealItem>
+          ))}
+        </dl>
+      </RevealGroup>
     </div>
   );
 }
