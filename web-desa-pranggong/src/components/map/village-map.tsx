@@ -13,6 +13,7 @@ import {
   type LocationCategory,
   type VillageLocation,
 } from "@/lib/village-locations";
+import { toWhatsAppLink } from "@/lib/utils";
 
 // Pinpoint pakai divIcon berwarna per kategori (bukan marker PNG default) agar selaras identitas visual.
 function markerIcon(category: LocationCategory) {
@@ -103,6 +104,17 @@ export default function VillageMap({
               )}
               {location.contact && (
                 <p className="text-xs text-ink-900/60">Kontak: {location.contact}</p>
+              )}
+              {location.category === "umkm" && location.contact && (
+                <a
+                  href={toWhatsAppLink(location.contact)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group mt-2 inline-flex items-center gap-1.5 rounded-full bg-moss-600 px-3 py-1.5 text-xs font-semibold text-paper-50 transition-colors hover:bg-moss-500"
+                >
+                  Chat WhatsApp
+                  <HoverArrow />
+                </a>
               )}
               {location.href && (
                 <Link

@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import HoverArrow from "@/components/ui/hover-arrow";
 import VillageMapLoader from "@/components/map/village-map-loader";
+import { toWhatsAppLink } from "@/lib/utils";
 import {
   categoryColors,
   categoryLabels,
@@ -141,34 +142,55 @@ export default function VillageExplorer({
             return (
               <div
                 key={item.id}
-                className="rounded-2xl border border-moss-900/10 p-5"
+                className="flex h-full flex-col rounded-2xl border border-moss-900/10 p-5"
               >
-                <span className="inline-block rounded-full bg-gold-600/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-gold-600">
+                <span className="inline-block w-fit rounded-full bg-gold-600/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-gold-600">
                   {categoryLabels.umkm}
                 </span>
                 <h3 className="mt-2 font-display text-lg font-semibold text-ink-900">
                   {item.name}
                 </h3>
-                <p className="mt-2 text-sm text-ink-900/70">{item.description}</p>
+                <p className="mt-2 flex-1 text-sm text-ink-900/70">
+                  {item.description}
+                </p>
                 {item.contact && (
-                  <p className="mt-2 text-xs text-ink-900/50">
+                  <p className="mt-3 text-xs text-ink-900/50">
                     Kontak: {item.contact}
                   </p>
                 )}
-                {onMap ? (
-                  <button
-                    type="button"
-                    onClick={() => focusLocation(mapLocationId)}
-                    className="group mt-4 inline-flex items-center gap-1 text-sm font-semibold text-moss-600 hover:underline"
-                  >
-                    Lihat di peta
-                    <HoverArrow direction="up" />
-                  </button>
-                ) : (
-                  <p className="mt-4 text-xs italic text-ink-900/40">
-                    Belum ada titik lokasi di peta.
-                  </p>
-                )}
+
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-moss-900/10 pt-4">
+                  {item.contact ? (
+                    <a
+                      href={toWhatsAppLink(item.contact)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group inline-flex items-center gap-1.5 rounded-full bg-moss-600 px-3.5 py-2 text-xs font-semibold text-paper-50 transition-colors hover:bg-moss-500"
+                    >
+                      Chat WhatsApp
+                      <HoverArrow />
+                    </a>
+                  ) : (
+                    <span className="text-xs text-ink-900/40">
+                      Kontak belum tersedia
+                    </span>
+                  )}
+
+                  {onMap ? (
+                    <button
+                      type="button"
+                      onClick={() => focusLocation(mapLocationId)}
+                      className="group inline-flex items-center gap-1 text-sm font-semibold text-moss-600 hover:underline"
+                    >
+                      Lihat di peta
+                      <HoverArrow direction="up" />
+                    </button>
+                  ) : (
+                    <span className="text-xs italic text-ink-900/40">
+                      Belum ada titik di peta
+                    </span>
+                  )}
+                </div>
               </div>
             );
           })}

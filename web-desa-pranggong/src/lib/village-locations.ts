@@ -1,7 +1,3 @@
-// Data pinpoint peta interaktif Desa Pranggong.
-// Koordinat masih PLACEHOLDER (perkiraan area Kec. Andong, Kab. Boyolali) —
-// ganti dengan hasil survey GPS/Google Maps sebelum rilis (lihat requirement.md § 8).
-
 export type LocationCategory =
   | "pemerintahan"
   | "kesehatan"
@@ -60,19 +56,22 @@ export const villageLocations: VillageLocation[] = [
     name: "SD Negeri Pranggong",
     category: "pendidikan",
     description: "Sekolah dasar negeri yang melayani anak-anak desa dan sekitarnya.",
-    contact: "0812-xxxx-xxxx",
+    contact: "-",
     hours: "Senin–Sabtu, 07.00–12.30 WIB",
     lat: -7.3592,
     lng: 110.7534,
   },
-  {
-    id: "masjid-desa",
-    name: "Masjid Besar Pranggong",
-    category: "ibadah",
-    description: "Tempat ibadah utama warga muslim Desa Pranggong.",
-    lat: -7.3605,
-    lng: 110.7538,
+    {
+    id: "sd-tempuran",
+    name: "SD Negeri Tempuran",
+    category: "pendidikan",
+    description: "Sekolah dasar negeri yang melayani anak-anak desa dan sekitarnya.",
+    contact: "-",
+    hours: "Senin–Sabtu, 07.00–12.30 WIB",
+    lat: -7.3592,
+    lng: 110.7534,
   },
+
   {
     id: "rocket-stove",
     name: "Titik Rocket Stove Dukuh Gemulung",
