@@ -52,6 +52,23 @@ model Umkm {
   updatedAt   DateTime @updatedAt
 }
 
+// Landasan hukum desa (Perdes, SK Kades, dll) — diinput admin lewat
+// /admin/landasan-hukum. File PDF disimpan langsung sebagai Bytes di DB
+// (bukan filesystem) supaya aman untuk deploy serverless. fileData dkk
+// opsional: entri boleh dibuat dulu, PDF menyusul kapan-kapan.
+model LegalBasis {
+  id        String   @id @default(cuid())
+  number    String
+  title     String
+  year      String
+  fileName  String?
+  fileType  String?
+  fileData  Bytes?
+  fileSize  Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Post {
   id        String   @id @default(cuid())
   type      PostType

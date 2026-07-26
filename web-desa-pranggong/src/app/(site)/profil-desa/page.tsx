@@ -3,6 +3,7 @@ import Eyebrow from "@/components/ui/eyebrow";
 import Reveal, { RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { siteConfig } from "@/lib/site-config";
 import { getVillageProfile } from "@/lib/village-profile";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "Profil Desa",
@@ -11,7 +12,19 @@ export const metadata: Metadata = {
 };
 
 export default async function ProfilDesaPage() {
-  const profile = await getVillageProfile();
+  const [profile, legalBasisList] = await Promise.all([
+    getVillageProfile(),
+    prisma.legalBasis.findMany({
+      select: {
+        id: true,
+        number: true,
+        title: true,
+        year: true,
+        fileName: true,
+      },
+      orderBy: [{ year: "desc" }, { createdAt: "desc" }],
+    }),
+  ]);
 
   const demographicStats = [
     { label: "Luas Wilayah", value: profile.area },
@@ -157,6 +170,77 @@ export default async function ProfilDesaPage() {
                 </li>
               )}
             </ul>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Landasan Hukum */}
+      <section className="bg-paper-100">
+        <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
+          <Reveal>
+            <Eyebrow>Dasar Hukum</Eyebrow>
+            <h2 className="mt-3 font-display text-2xl font-semibold text-ink-900">
+              Landasan Hukum
+            </h2>
+            <p className="mt-3 max-w-2xl text-ink-900/70">
+              Peraturan dan keputusan yang menjadi dasar penyelenggaraan
+              pemerintahan Desa Pranggong. Dokumen lengkap dapat diunduh
+              dalam format PDF.
+            </p>
+          </Reveal>
+
+          <Reveal delay={0.1}>
+            <div className="mt-6 overflow-x-auto rounded-2xl border border-black/5 bg-paper-50 shadow-sm shadow-black/[0.02]">
+              <table className="w-full min-w-[560px] text-left text-sm">
+                <thead>
+                  <tr className="border-b border-moss-900/10 text-xs font-semibold uppercase tracking-wide text-ink-900/50">
+                    <th className="px-5 py-3">Nomor</th>
+                    <th className="px-5 py-3">Tentang</th>
+                    <th className="px-5 py-3">Tahun</th>
+                    <th className="px-5 py-3 text-right">Dokumen</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-moss-900/10">
+                  {legalBasisList.map((item) => (
+                    <tr key={item.id}>
+                      <td className="px-5 py-4 font-medium text-ink-900">
+                        {item.number}
+                      </td>
+                      <td className="px-5 py-4 text-ink-900/70">
+                        {item.title}
+                      </td>
+                      <td className="px-5 py-4 text-ink-900/70">
+                        {item.year}
+                      </td>
+                      <td className="px-5 py-4 text-right">
+                        {item.fileName ? (
+                          <a
+                            href={`/api/landasan-hukum/${item.id}`}
+                            className="font-semibold text-moss-600 hover:underline"
+                          >
+                            Unduh PDF
+                          </a>
+                        ) : (
+                          <span className="text-xs italic text-ink-900/40">
+                            Belum tersedia
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                  {legalBasisList.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className="px-5 py-8 text-center text-sm text-ink-900/50"
+                      >
+                        Belum ada data landasan hukum.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </Reveal>
         </div>
       </section>
