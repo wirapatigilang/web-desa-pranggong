@@ -108,7 +108,7 @@ export default async function ProfilDesaPage() {
         <RevealGroup className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {demographicStats.map((stat) => (
             <RevealItem key={stat.label}>
-              <div className="border border-moss-900/10 p-5">
+              <div className="rounded-2xl border border-black/5 bg-paper-50 p-5 shadow-sm shadow-black/[0.02]">
                 <p className="text-xs font-semibold uppercase tracking-wide text-gold-600">
                   {stat.label}
                 </p>
@@ -127,7 +127,7 @@ export default async function ProfilDesaPage() {
           <dl className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {boundaries.map((boundary) => (
               <RevealItem key={boundary.label}>
-                <div className="border border-moss-900/10 p-5">
+                <div className="rounded-2xl border border-black/5 bg-paper-50 p-5 shadow-sm shadow-black/[0.02]">
                   <dt className="text-xs font-semibold uppercase tracking-wide text-gold-600">
                     {boundary.label}
                   </dt>
@@ -150,7 +150,7 @@ export default async function ProfilDesaPage() {
               Struktur Organisasi
             </h2>
 
-            <ul className="mt-6 divide-y divide-paper-50/10 border border-paper-50/15">
+            <ul className="mt-6 divide-y divide-paper-50/10 overflow-hidden rounded-2xl border border-paper-50/15">
               {profile.orgStructure.map((entry) => (
                 <li
                   key={entry.role}
