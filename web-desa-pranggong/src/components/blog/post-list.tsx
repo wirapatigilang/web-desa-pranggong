@@ -21,7 +21,7 @@ export default function PostList({ posts }: { posts: Post[] }) {
         <button
           type="button"
           onClick={() => setActiveType("semua")}
-          className={`border px-3 py-1.5 text-sm transition-colors ${
+          className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
             activeType === "semua"
               ? "border-moss-600 bg-moss-600 text-paper-50"
               : "border-moss-900/15 text-ink-900/70 hover:border-moss-600/50"
@@ -34,7 +34,7 @@ export default function PostList({ posts }: { posts: Post[] }) {
             key={type}
             type="button"
             onClick={() => setActiveType(type)}
-            className={`border px-3 py-1.5 text-sm transition-colors ${
+            className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
               activeType === type
                 ? "border-moss-600 bg-moss-600 text-paper-50"
                 : "border-moss-900/15 text-ink-900/70 hover:border-moss-600/50"

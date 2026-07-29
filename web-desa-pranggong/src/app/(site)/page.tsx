@@ -19,7 +19,7 @@ function PostCard({ post }: { post: Post }) {
           })}
         </p>
         {post.pinned && (
-          <span className="text-xs font-semibold uppercase tracking-wide text-gold-600">
+          <span className="rounded-full bg-ink-900/5 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-ink-900/40">
             Disematkan
           </span>
         )}

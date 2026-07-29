@@ -16,6 +16,7 @@ export default async function AdminLegalBasisPage() {
   const items = await prisma.legalBasis.findMany({
     select: {
       id: true,
+      type: true,
       number: true,
       title: true,
       year: true,
@@ -28,7 +29,7 @@ export default async function AdminLegalBasisPage() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Landasan Hukum</h1>
+          <h1 className="text-2xl font-semibold">Regulasi Desa</h1>
           <p className="text-sm text-muted-foreground">
             Kelola daftar peraturan/keputusan desa yang tampil di halaman
             Profil Desa.
@@ -43,6 +44,7 @@ export default async function AdminLegalBasisPage() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Jenis Regulasi</TableHead>
               <TableHead>Nomor</TableHead>
               <TableHead>Tentang</TableHead>
               <TableHead>Tahun</TableHead>
@@ -53,6 +55,7 @@ export default async function AdminLegalBasisPage() {
           <TableBody>
             {items.map((item) => (
               <TableRow key={item.id}>
+                <TableCell>{item.type}</TableCell>
                 <TableCell className="font-medium">{item.number}</TableCell>
                 <TableCell>{item.title}</TableCell>
                 <TableCell>{item.year}</TableCell>
@@ -86,10 +89,10 @@ export default async function AdminLegalBasisPage() {
             {items.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={6}
                   className="py-8 text-center text-sm text-muted-foreground"
                 >
-                  Belum ada landasan hukum. Klik &ldquo;+ Tambah&rdquo; untuk
+                  Belum ada regulasi desa. Klik &ldquo;+ Tambah&rdquo; untuk
                   menambah yang pertama.
                 </TableCell>
               </TableRow>

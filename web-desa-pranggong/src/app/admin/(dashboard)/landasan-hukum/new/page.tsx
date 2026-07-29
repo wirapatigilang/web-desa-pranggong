@@ -4,7 +4,7 @@ import { createLegalBasis } from "@/lib/actions/legal-basis";
 export default function NewLegalBasisPage() {
   return (
     <div>
-      <h1 className="text-2xl font-semibold">Tambah Landasan Hukum</h1>
+      <h1 className="text-2xl font-semibold">Tambah Regulasi Desa</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Tambahkan peraturan/keputusan desa ke halaman Profil Desa.
       </p>

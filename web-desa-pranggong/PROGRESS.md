@@ -60,6 +60,23 @@
 
 ## Log Pengerjaan
 
+### 2026-07-26 — Rounded badge "Disematkan" di section Pengumuman/Berita homepage
+`post-list.tsx` (dipakai di `/blog`) sudah lebih dulu punya badge rounded-pill (lihat log sebelumnya). Ternyata `PostCard` di `src/app/(site)/page.tsx` (dipakai section "Pengumuman" & "Berita" di homepage, komponen beda tapi datanya sama) masih pakai badge "Disematkan" versi lama (teks polos, tanpa background/rounded) — jadi tidak konsisten. Diseragamkan: `rounded-full bg-ink-900/5 px-2.5 py-1 ... text-ink-900/40`, persis warna & bentuk badge "Disematkan" di `/blog`.
+- Verifikasi: `npm run lint` bersih, `npm run build` sukses. Belum bisa dicek visual di HTML curl karena belum ada post dengan `pinned: true` di data saat ini — style-nya benar secara kode/build, tapi badge-nya baru kelihatan begitu ada post yang disematkan.
+
+### 2026-07-26 — Ganti label "Landasan Hukum" jadi "Regulasi Desa" (admin & publik)
+User minta judul fitur diganti. Cuma teks yang tampil ke user yang diubah — route/URL (`/admin/landasan-hukum`, `/api/landasan-hukum/[id]`), nama file/folder, nama model Prisma (`LegalBasis`), dan nama fungsi/variabel di kode SENGAJA TIDAK diubah (rename struktural itu bukan yang diminta, dan berisiko putus link/bookmark yang sudah ada tanpa manfaat tambahan).
+- Diganti: label sidebar admin, judul H1 di 3 halaman admin (list/tambah/edit), heading section di `/profil-desa`, teks empty-state (admin & publik), pesan error "tidak ditemukan" di server action.
+- Verifikasi: `npm run lint` bersih, `npm run build` sukses.
+
+### 2026-07-26 — Ubah bentuk tabel Landasan Hukum sesuai referensi (No. / Jenis Regulasi / Nomor Peraturan / Tentang)
+User kasih screenshot referensi tabel landasan hukum desa lain (No., Jenis Regulasi, Nomor Peraturan, Tentang) — bentuk kolom sebelumnya (Nomor/Tentang/Tahun/Dokumen terpisah) diubah mengikuti itu.
+- Tambah field baru `type` (Jenis Regulasi) ke model `LegalBasis` (migration `20260726073552_add_legal_basis_type`, default `"Peraturan Desa"` biar aman kalau ada baris lama). Form admin (`legal-basis-form.tsx`) input-nya `Select` dengan 4 opsi tetap (Peraturan Desa/Peraturan Kepala Desa/Keputusan Kepala Desa/Peraturan Bersama Kepala Desa) — tetap kolom `String` biasa di DB (bukan enum Prisma) supaya tidak kaku kalau ke depan ada jenis lain.
+- Kolom "Nomor Peraturan" di tabel publik sekarang gabungan `number`+`year` yang di-render jadi teks `"Nomor {number} Tahun {year}"` — field DB-nya TETAP terpisah (`number`, `year`), cuma cara tampilnya yang digabung. Placeholder input "Nomor" di form diubah dari "mis. 03 Tahun 2023" jadi "mis. 01" biar admin tidak dobel nulis "Tahun".
+- Kolom "Dokumen"/unduh yang sebelumnya kolom terpisah, sekarang DIHAPUS sebagai kolom sendiri — link unduh PDF disatukan ke kolom "Tentang" (judul jadi link + ikon `FileDown` dari `lucide-react` kalau file ada, teks polos kalau belum), plus catatan kecil di bawah tabel menjelaskan arti ikon itu. Ini supaya bentuk tabel visually persis 4 kolom seperti referensi, tapi fitur unduh PDF (permintaan awal user) tetap ada.
+- Admin list (`/admin/landasan-hukum`) & form edit ikut ditambah kolom/field "Jenis Regulasi" biar konsisten dengan data yang sekarang wajib diisi di create/update action (`src/lib/actions/legal-basis.ts`).
+- Verifikasi: `npm run lint` bersih, `npm run build` sukses (18 route). Belum sempat dicek lewat browser sungguhan (submit form, cek tampilan ikon FileDown) — user perlu restart dev server dulu (lihat log 2026-07-26 sebelumnya soal Prisma Client basi).
+
 ### 2026-07-26 — Section "Landasan Hukum" di Profil Desa + CRUD admin + upload PDF
 User minta section baru di `/profil-desa` berupa tabel landasan hukum desa, yang tiap barisnya bisa berupa file PDF utuh untuk diunduh, plus CRUD-nya di admin dan item sidebar sendiri.
 

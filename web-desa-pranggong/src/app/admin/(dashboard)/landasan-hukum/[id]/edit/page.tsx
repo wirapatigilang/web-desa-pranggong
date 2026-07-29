@@ -12,6 +12,7 @@ export default async function EditLegalBasisPage({
   const item = await prisma.legalBasis.findUnique({
     select: {
       id: true,
+      type: true,
       number: true,
       title: true,
       year: true,
@@ -26,7 +27,7 @@ export default async function EditLegalBasisPage({
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold">Edit Landasan Hukum</h1>
+      <h1 className="text-2xl font-semibold">Edit Regulasi Desa</h1>
       <p className="mt-1 text-sm text-muted-foreground">{item.number}</p>
       <div className="mt-6">
         <LegalBasisForm

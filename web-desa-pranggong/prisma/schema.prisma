@@ -58,6 +58,7 @@ model Umkm {
 // opsional: entri boleh dibuat dulu, PDF menyusul kapan-kapan.
 model LegalBasis {
   id        String   @id @default(cuid())
+  type      String   @default("Peraturan Desa")
   number    String
   title     String
   year      String

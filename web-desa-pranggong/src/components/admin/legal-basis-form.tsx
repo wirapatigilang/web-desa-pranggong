@@ -7,8 +7,22 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { LegalBasisFormState } from "@/lib/actions/legal-basis";
 import type { LegalBasis } from "@/generated/prisma/client";
+
+const regulationTypes = [
+  "Peraturan Desa",
+  "Peraturan Kepala Desa",
+  "Keputusan Kepala Desa",
+  "Peraturan Bersama Kepala Desa",
+];
 
 export default function LegalBasisForm({
   action,
@@ -21,7 +35,7 @@ export default function LegalBasisForm({
   ) => Promise<LegalBasisFormState>;
   defaultValues?: Pick<
     LegalBasis,
-    "number" | "title" | "year" | "fileName"
+    "type" | "number" | "title" | "year" | "fileName"
   >;
   submitLabel: string;
 }) {
@@ -40,12 +54,28 @@ export default function LegalBasisForm({
   return (
     <form action={formAction} className="max-w-xl space-y-5">
       <div className="space-y-2">
+        <Label htmlFor="type">Jenis Regulasi</Label>
+        <Select name="type" defaultValue={defaultValues?.type ?? regulationTypes[0]}>
+          <SelectTrigger id="type" className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {regulationTypes.map((type) => (
+              <SelectItem key={type} value={type}>
+                {type}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="number">Nomor</Label>
         <Input
           id="number"
           name="number"
           required
-          placeholder="mis. 03 Tahun 2023"
+          placeholder="mis. 01"
           defaultValue={defaultValues?.number}
         />
       </div>

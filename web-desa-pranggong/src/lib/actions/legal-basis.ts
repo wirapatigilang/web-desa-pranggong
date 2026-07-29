@@ -35,12 +35,13 @@ export async function createLegalBasis(
 ): Promise<LegalBasisFormState> {
   await requireSession();
 
+  const type = String(formData.get("type") ?? "").trim();
   const number = String(formData.get("number") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim();
   const year = String(formData.get("year") ?? "").trim();
 
-  if (!number || !title || !year) {
-    return { error: "Nomor, judul/tentang, dan tahun wajib diisi." };
+  if (!type || !number || !title || !year) {
+    return { error: "Jenis regulasi, nomor, tentang, dan tahun wajib diisi." };
   }
 
   const file = await parseFile(formData);
@@ -50,6 +51,7 @@ export async function createLegalBasis(
 
   await prisma.legalBasis.create({
     data: {
+      type,
       number,
       title,
       year,
@@ -76,17 +78,18 @@ export async function updateLegalBasis(
 ): Promise<LegalBasisFormState> {
   await requireSession();
 
+  const type = String(formData.get("type") ?? "").trim();
   const number = String(formData.get("number") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim();
   const year = String(formData.get("year") ?? "").trim();
 
-  if (!number || !title || !year) {
-    return { error: "Nomor, judul/tentang, dan tahun wajib diisi." };
+  if (!type || !number || !title || !year) {
+    return { error: "Jenis regulasi, nomor, tentang, dan tahun wajib diisi." };
   }
 
   const existing = await prisma.legalBasis.findUnique({ where: { id } });
   if (!existing) {
-    return { error: "Data landasan hukum tidak ditemukan." };
+    return { error: "Data regulasi desa tidak ditemukan." };
   }
 
   const file = await parseFile(formData);
@@ -97,6 +100,7 @@ export async function updateLegalBasis(
   await prisma.legalBasis.update({
     where: { id },
     data: {
+      type,
       number,
       title,
       year,
