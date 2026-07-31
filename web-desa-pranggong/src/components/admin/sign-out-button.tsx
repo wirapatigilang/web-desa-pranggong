@@ -10,7 +10,6 @@ export default function SignOutButton() {
   async function handleSignOut() {
     await authClient.signOut();
     router.push("/admin/login");
-    router.refresh();
   }
 
   return (
