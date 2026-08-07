@@ -24,7 +24,7 @@ const buildSteps = [
       "Dokumentasi tahap perakitan ruang bakar berbentuk L dan pemasangan isolator di sekitar pipa pembakaran.",
   },
   {
-    title: "Hasil akhir & uji coba",
+    title: "Hasil akhir",
     description:
       "Dokumentasi tungku yang sudah jadi beserta uji nyala pertama di lokasi demo.",
   },
@@ -66,13 +66,7 @@ export default function RocketStovePage() {
           <Eyebrow>Apa Itu Rocket Stove</Eyebrow>
           <div className="mt-3 grid gap-8 md:grid-cols-[1.2fr_1fr]">
             <p className="max-w-2xl text-ink-900/70">
-              Rocket Stove adalah tungku masak sederhana dengan ruang bakar
-              berbentuk huruf L yang diisolasi. Desain ini membuat kayu
-              bakar terbakar lebih sempurna pada suhu tinggi di satu titik
-              kecil, sehingga panas yang dihasilkan lebih terpusat ke alat
-              masak, bahan bakar yang dibutuhkan lebih sedikit, dan asap
-              yang dihasilkan jauh lebih berkurang dibanding tungku terbuka
-              konvensional.
+              Rocket Stove adalah inovasi tungku masak sederhana yang dirancang khusus dengan ruang bakar berbentuk huruf L atau J yang terisolasi dengan baik. Desain struktural ini memastikan aliran udara atau sirkulasi oksigen bekerja secara optimal, sehingga ranting atau kayu bakar dapat terbakar jauh lebih sempurna pada suhu yang sangat tinggi. Panas yang dihasilkan tidak menyebar sia-sia, melainkan terpusat langsung ke bagian bawah alat masak. Sistem pembakaran cerdas ini memberikan keuntungan yang signifikan: jumlah bahan bakar yang dibutuhkan menjadi jauh lebih efisien, proses memasak menjadi lebih cepat, dan kepulan asap yang dihasilkan berkurang secara drastis dibandingkan dengan tungku terbuka konvensional, sehingga menciptakan lingkungan dapur yang lebih sehat dan bersih.
             </p>
             <ImagePlaceholder label="Foto/diagram Rocket Stove" />
           </div>
