@@ -23,7 +23,7 @@ export type VillageProfileData = {
 // Dipakai kalau row "singleton" belum ada di database (mis. belum sempat `prisma db seed`).
 const FALLBACK: VillageProfileData = {
   history:
-    "Sejarah lengkap Desa Pranggong akan dilengkapi oleh perangkat desa lewat dashboard admin.",
+    "Tradisi desa akan dilengkapi oleh perangkat desa lewat dashboard admin.",
   vision: "Visi desa akan dilengkapi oleh perangkat desa lewat dashboard admin.",
   missions: ["Poin-poin misi akan diisi lewat dashboard admin."],
   orgStructure: [],

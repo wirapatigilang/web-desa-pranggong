@@ -9,7 +9,7 @@ import { prisma } from "@/lib/prisma";
 export const metadata: Metadata = {
   title: "Profil Desa",
   description:
-    "Sejarah, visi & misi, struktur organisasi, serta data geografis dan demografis Desa Pranggong.",
+    "Tradisi desa, visi & misi, struktur organisasi, serta data geografis dan demografis Desa Pranggong.",
 };
 
 export default async function ProfilDesaPage() {
@@ -51,22 +51,28 @@ export default async function ProfilDesaPage() {
             {siteConfig.name}
           </h1>
           <p className="mt-3 max-w-2xl text-ink-900/70">
-            Sejarah, visi &amp; misi, struktur organisasi, serta data
+            Tradisi desa, visi &amp; misi, struktur organisasi, serta data
             geografis dan demografis {siteConfig.name}, Kecamatan{" "}
             {siteConfig.kecamatan}, Kabupaten {siteConfig.kabupaten}.
           </p>
         </Reveal>
       </div>
 
-      {/* Sejarah */}
+      {/* Tradisi Desa */}
       <section className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
         <Reveal>
-          <Eyebrow>Sejarah</Eyebrow>
+          <Eyebrow>Tradisi Desa</Eyebrow>
           <h2 className="mt-3 font-display text-2xl font-semibold text-ink-900">
-            Sejarah Desa
+            Tradisi Bersih Desa
           </h2>
           <div className="mt-4 max-w-3xl space-y-4 text-ink-900/70">
-            <p>{profile.history}</p>
+            {profile.history
+              .split("\n")
+              .map((line) => line.trim())
+              .filter(Boolean)
+              .map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
           </div>
         </Reveal>
       </section>

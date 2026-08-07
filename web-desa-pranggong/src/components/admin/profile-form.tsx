@@ -37,13 +37,17 @@ export default function ProfileForm({
   return (
     <form action={formAction} className="max-w-3xl space-y-8">
       <div className="space-y-4">
-        <h2 className="font-semibold">Sejarah &amp; Visi Misi</h2>
+        <h2 className="font-semibold">Tradisi &amp; Visi Misi</h2>
         <div className="space-y-2">
-          <Label htmlFor="history">Sejarah Desa</Label>
+          <Label htmlFor="history">Tradisi Desa</Label>
+          <p className="text-xs text-muted-foreground">
+            Satu paragraf per baris — tiap baris akan tampil sebagai
+            paragraf terpisah di halaman publik.
+          </p>
           <Textarea
             id="history"
             name="history"
-            rows={5}
+            rows={8}
             required
             defaultValue={defaultValues.history}
           />

@@ -97,7 +97,7 @@ async function seedVillageProfile() {
     create: {
       id: "singleton",
       history:
-        "Sejarah lengkap Desa Pranggong — asal-usul nama, tokoh pendiri, dan perkembangan wilayah dari masa ke masa — akan dilengkapi bersama perangkat desa dan sesepuh setempat.",
+        "Tradisi Bersih Desa merupakan salah satu warisan budaya yang masih dilestarikan oleh masyarakat Desa Pranggong. Tradisi ini dilaksanakan setahun sekali sebagai wujud rasa syukur kepada Tuhan Yang Maha Esa atas hasil pertanian dan rezeki yang telah diberikan. Melalui tradisi ini, masyarakat memanjatkan doa agar hasil panen berikutnya semakin melimpah, diberi keberkahan, serta seluruh warga senantiasa memperoleh keselamatan, kesehatan, dan kesejahteraan.\nPelaksanaan Bersih Desa telah diwariskan secara turun-temurun dari generasi ke generasi dan menjadi momen penting yang mempererat kebersamaan masyarakat. Dalam tradisi ini, warga secara gotong royong mempersiapkan berbagai hidangan untuk dinikmati bersama sebagai simbol rasa syukur, persaudaraan, dan kerukunan.\nRangkaian kegiatan Bersih Desa diawali dengan kerja bakti membersihkan lingkungan sebagai bentuk kepedulian terhadap kebersihan desa. Selanjutnya dilaksanakan doa bersama, kenduri atau makan bersama, serta pengajian sebagai wujud rasa syukur dan doa agar Desa Pranggong senantiasa diberikan keselamatan, kemakmuran, dan keberkahan.",
       vision:
         "Visi resmi Desa Pranggong untuk periode kepemimpinan saat ini akan dilengkapi oleh perangkat desa.",
       missions: "Poin-poin misi akan diisi sesuai dokumen RPJM Desa yang berlaku.",

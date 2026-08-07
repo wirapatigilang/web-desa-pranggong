@@ -14,6 +14,24 @@ import type { Umkm } from "@/generated/prisma/client";
 
 const categories = Object.keys(categoryLabels) as LocationCategory[];
 
+type GapoktanEntry = {
+  name: string;
+  type: "Poktan" | "KWT";
+  hamlet: string;
+  chairperson: string;
+};
+
+const gapoktanList: GapoktanEntry[] = [
+  { name: "Setyo Mulyo", type: "Poktan", hamlet: "Pranggong", chairperson: "Sukardi" },
+  { name: "Sumber Tani", type: "Poktan", hamlet: "Beran", chairperson: "Sri Hartati" },
+  { name: "Sumber Makmur", type: "Poktan", hamlet: "Beran", chairperson: "Nunung Witaruna" },
+  { name: "Sumber Rejeki", type: "Poktan", hamlet: "Jenggotan", chairperson: "Suwardi" },
+  { name: "Sumber Mulyo", type: "Poktan", hamlet: "Jenggotan", chairperson: "Mujahid" },
+  { name: "Ngrawan Makmur", type: "Poktan", hamlet: "Ngrawan", chairperson: "Wawan Ardiyanto" },
+  { name: "KWT Margi Rahayu", type: "KWT", hamlet: "Ngrawan", chairperson: "Eko Purwati" },
+  { name: "KWT Setyo Mulyo", type: "KWT", hamlet: "Pranggong", chairperson: "Kisminah" },
+];
+
 export default function VillageExplorer({
   locations,
   umkmItems,
@@ -197,6 +215,103 @@ export default function VillageExplorer({
           {umkmItems.length === 0 && (
             <p className="text-sm text-ink-900/50">Data UMKM belum tersedia.</p>
           )}
+        </div>
+      </div>
+
+      <div className="mt-14">
+        <h2 className="font-display text-2xl font-semibold text-ink-900">
+          Potensi Desa — Gapoktan &amp; Kelompok Tani
+        </h2>
+
+        <div className="mt-4 max-w-3xl space-y-4 text-sm text-ink-900/70">
+          <p>
+            Gabungan Kelompok Tani (GAPOKTAN) adalah organisasi antara petani
+            dalam satu desa dengan berbagai lembaga di luar desa, tujuannya
+            untuk mengembangkan dan membina usaha pertanian yang kuat dan
+            mandiri. Gapoktan merupakan kumpulan beberapa Kelompok Tani yang
+            bergabung dan bekerjasama untuk meningkatkan skala ekonomi dan
+            efisiensi usaha, fungsinya sebagai penyedia modal bagi petani
+            anggota, sarana produksi, pemasaran hasil pertanian, hingga
+            memberikan informasi yang dibutuhkan oleh petani.
+          </p>
+          <p>
+            Kelompok Tani atau disebut Poktan adalah kumpulan
+            petani/peternak/pekebun yang dibentuk oleh para petani atas dasar
+            kesamaan kepentingan, kesamaan kondisi lingkungan sosial, ekonomi
+            dan sumberdaya, kesamaan komoditas, dan keakraban untuk
+            meningkatkan dan mengembangkan usaha anggota.
+          </p>
+          <p>
+            Keberadaan Kelompok Tani (Poktan) dan Kelompok Wanita Tani (KWT)
+            dapat mendukung potensi pertanian di Desa Pranggong, serta
+            mendukung kegiatan budidaya dan pemberdayaan masyarakat di sektor
+            pertanian. Akan tetapi, informasi mengenai keberadaan kelompok
+            tani tersebut belum terdokumentasi secara sistematis dalam bentuk
+            database digital, oleh karena itu diperlukan Database Kelompok
+            Tani dan Kelompok Wanita Tani di Desa Pranggong.
+          </p>
+          <p>
+            Database Kelompok Tani dan Kelompok Wanita Tani (KWT) tersebut
+            tujuannya untuk mendokumentasikan potensi kelembagaan pertanian
+            di Desa Pranggong, Kecamatan Andong, Kabupaten Boyolali supaya
+            informasi mengenai kelompok tani tersusun secara sistematis,
+            menyediakan informasi mengenai persebaran kelompok tani dan
+            kelompok wanita tani yang mudah diakses, serta mendukung
+            perencanaan pembangunan di sektor pertanian desa.
+          </p>
+          <p>
+            Berdasarkan hasil pengumpulan data, diperoleh informasi bahwa
+            Desa Pranggong saat ini memiliki {gapoktanList.length} kelompok
+            tani yang aktif, terdiri atas{" "}
+            {gapoktanList.filter((g) => g.type === "Poktan").length} kelompok
+            tani dan{" "}
+            {gapoktanList.filter((g) => g.type === "KWT").length} kelompok
+            wanita tani. Daftar Kelompok Tani di Desa Pranggong adalah
+            sebagai berikut:
+          </p>
+        </div>
+
+        <div className="mt-6 overflow-x-auto rounded-2xl border border-moss-900/10 bg-paper-50 shadow-sm shadow-black/[0.02]">
+          <table className="w-full min-w-[560px] text-left text-sm">
+            <thead>
+              <tr className="border-b border-moss-900/10 text-xs font-semibold uppercase tracking-wide text-ink-900/50">
+                <th className="px-5 py-3">No.</th>
+                <th className="px-5 py-3">Nama Kelompok</th>
+                <th className="px-5 py-3">Jenis</th>
+                <th className="px-5 py-3">Dukuh</th>
+                <th className="px-5 py-3">Ketua</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-moss-900/10">
+              {gapoktanList.map((item, index) => (
+                <tr key={item.name}>
+                  <td className="px-5 py-4 align-top text-ink-900/70">
+                    {index + 1}.
+                  </td>
+                  <td className="px-5 py-4 align-top font-medium text-ink-900">
+                    {item.name}
+                  </td>
+                  <td className="px-5 py-4 align-top">
+                    <span
+                      className={`inline-block rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${
+                        item.type === "KWT"
+                          ? "bg-gold-600/10 text-gold-600"
+                          : "bg-moss-600/10 text-moss-600"
+                      }`}
+                    >
+                      {item.type}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4 align-top text-ink-900/70">
+                    {item.hamlet}
+                  </td>
+                  <td className="px-5 py-4 align-top text-ink-900/70">
+                    {item.chairperson}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

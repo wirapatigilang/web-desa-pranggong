@@ -26,7 +26,7 @@ export async function updateVillageProfile(
   const orgStructureRaw = String(formData.get("orgStructure") ?? "[]");
 
   if (!history || !vision || !missions) {
-    return { error: "Sejarah, visi, dan misi wajib diisi." };
+    return { error: "Tradisi desa, visi, dan misi wajib diisi." };
   }
 
   let orgStructure: { role: string; name: string }[];
