@@ -9,6 +9,7 @@ const navItems = [
   { label: "Profil Desa", href: "/admin/profil" },
   { label: "UMKM", href: "/admin/umkm" },
   { label: "Regulasi Desa", href: "/admin/landasan-hukum" },
+  { label: "Pengaturan Akun", href: "/admin/pengaturan" },
 ];
 
 export default function SidebarNav() {
