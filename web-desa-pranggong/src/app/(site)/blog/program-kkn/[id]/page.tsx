@@ -76,7 +76,7 @@ export default async function KknReportDetailPage({
           />
         </div>
 
-        <p className="mt-8 whitespace-pre-line text-base leading-relaxed text-ink-900/80">
+        <p className="mt-8 text-justify whitespace-pre-line text-base leading-relaxed text-ink-900/80">
           {report.description}
         </p>
       </Reveal>

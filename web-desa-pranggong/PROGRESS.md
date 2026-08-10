@@ -63,6 +63,16 @@
 
 ## Log Pengerjaan
 
+### 2026-08-11 — Komponen dropzone gambar untuk form admin (ganti `<Input type="file">` basic)
+User minta input gambar di form admin "diperbagus" (pakai skill `frontend-design`) — sebelumnya cuma `<Input type="file">` bawaan shadcn, tidak ada preview/drag-and-drop.
+
+- Komponen baru `src/components/admin/image-upload-field.tsx` (reusable, "use client"): dropzone `rounded-xl border-dashed`, klik ATAU drag-and-drop untuk pilih gambar, preview langsung (object-cover, `URL.createObjectURL`, di-revoke saat ganti/unmount biar tidak leak), overlay nama file+ukuran saat hover, tombol "x" buat batalkan gambar baru yang barusan dipilih (revert ke gambar lama saat edit). Validasi tipe/ukuran juga dicek client-side (feedback instan sebelum submit) — validasi server tetap jadi sumber kebenaran (`kkn-reports.ts` tidak diubah).
+- **Trik teknis**: `<input type="file">` aslinya tetap ada tapi disembunyikan (`sr-only`, BUKAN `hidden`/`display:none`) supaya tetap ikut serialisasi `FormData` native saat form displaySubmit — tidak reinvent form handling, cuma dibungkus UI kustom di atasnya. Drag-drop assign file ke `inputRef.current.files` langsung (`DataTransfer.files`) supaya path submit-nya sama persis dengan klik-pilih-file biasa.
+- **Sengaja tidak pakai HTML5 `required` di input tersembunyi** — kalau dipasang, popup validasi browser bakal nongol di posisi aneh (elemennya visually hidden). Indikator wajib cukup tanda `*` di label + pesan error dari server action yang sudah ada (`"Gambar wajib diunggah."`, sudah tampil sebagai toast).
+- Dipakai di `kkn-report-form.tsx`, gantikan blok manual (preview `<img>` + `<Input type="file">` + teks bantuan terpisah) jadi satu komponen. Belum dipakai di `legal-basis-form.tsx` (itu upload PDF, bukan gambar — beda konteks, di luar permintaan user kali ini).
+- Verifikasi: `npm run lint` bersih, `npm run build` sukses (21 route, tidak ada perubahan skema).
+- **Belum diuji lewat browser sungguhan** (drag-and-drop beneran, preview muncul benar, submit form dengan gambar hasil drop) — cek ini setelah dev server direstart (masih ada gotcha Prisma Client basi dari perubahan skema sebelumnya, lihat log di bawah).
+
 ### 2026-08-11 — Kategori "Program KKN" di halaman Berita + CRUD admin (model terpisah, gambar Bytes di Postgres)
 User minta wadah untuk laporan KKN: kategori baru "Program KKN" di `/blog`, CRUD di admin, isi judul+satu gambar+deskripsi. Dibahas lewat `superpowers:brainstorming` dulu (3 keputusan desain dikonfirmasi eksplisit ke user): (1) laporan KKN dapat **halaman detail sendiri** (beda dari Berita/Pengumuman yang masih card-only, belum ada `/blog/[slug]`), (2) gambar disimpan sebagai **Bytes di Postgres** (konsisten pola PDF Landasan Hukum, nol dependency baru), (3) **model Prisma terpisah** (`KknReport`, bukan nimbrung ke `Post`/`PostType` enum, karena bentuk datanya beda — cuma judul+gambar+deskripsi, bukan excerpt+content+pinned).
 

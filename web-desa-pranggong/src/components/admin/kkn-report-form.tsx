@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import ImageUploadField from "@/components/admin/image-upload-field";
 import type { KknReportFormState } from "@/lib/actions/kkn-reports";
 import type { KknReport } from "@/generated/prisma/client";
 
@@ -58,37 +59,23 @@ export default function KknReportForm({
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="image">
-          Gambar {defaultValues ? "" : "(wajib)"}
-        </Label>
-        {defaultValues?.id && (
-          <div className="overflow-hidden rounded-md border">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`/api/laporan-kkn/${defaultValues.id}/image`}
-              alt={defaultValues.title}
-              className="h-40 w-full object-cover"
-            />
-          </div>
-        )}
-        {defaultValues && (
-          <p className="text-xs text-muted-foreground">
-            Unggah gambar baru untuk mengganti, atau biarkan kosong untuk
-            tetap memakai gambar saat ini.
-          </p>
-        )}
-        <Input
-          id="image"
-          name="image"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          required={!defaultValues}
-        />
-        <p className="text-xs text-muted-foreground">
-          Format JPEG/PNG/WebP, maksimal 5MB.
-        </p>
-      </div>
+      <ImageUploadField
+        id="image"
+        name="image"
+        label="Gambar"
+        required
+        defaultImageUrl={
+          defaultValues?.id
+            ? `/api/laporan-kkn/${defaultValues.id}/image`
+            : undefined
+        }
+        defaultImageAlt={defaultValues?.title}
+        helperText={
+          defaultValues
+            ? "Klik atau seret gambar baru untuk mengganti. Biarkan seperti ini untuk tetap memakai gambar saat ini. Format JPEG/PNG/WebP, maksimal 5MB."
+            : "Format JPEG, PNG, atau WebP, maksimal 5MB."
+        }
+      />
 
       {state.error && <p className="text-sm text-destructive">{state.error}</p>}
 

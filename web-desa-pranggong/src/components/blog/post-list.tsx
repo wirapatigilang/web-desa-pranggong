@@ -133,7 +133,11 @@ export default function PostList({
                 <h3 className="mt-2 font-display text-lg font-semibold text-ink-900">
                   {item.title}
                 </h3>
-                <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-ink-900/70">
+                <p
+                  className={`mt-2 line-clamp-3 text-sm leading-relaxed text-ink-900/70 ${
+                    item.category === "program_kkn" ? "text-justify" : ""
+                  }`}
+                >
                   {item.excerpt}
                 </p>
               </>
