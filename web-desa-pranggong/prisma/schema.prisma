@@ -82,6 +82,21 @@ model Post {
   updatedAt DateTime @updatedAt
 }
 
+// Laporan Program KKN — kategori terpisah dari Post, ditampilkan bareng
+// Pengumuman/Berita di /blog. Gambar wajib, disimpan sebagai Bytes di DB
+// (pola sama seperti LegalBasis.fileData) supaya aman untuk deploy serverless.
+model KknReport {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  imageData   Bytes
+  imageType   String
+  imageName   String
+  imageSize   Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model User {
   id            String    @id
   name          String

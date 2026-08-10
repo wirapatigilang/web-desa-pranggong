@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { label: "Dashboard", href: "/admin" },
   { label: "Berita & Pengumuman", href: "/admin/posts" },
+  { label: "Laporan Program KKN", href: "/admin/laporan-kkn" },
   { label: "Profil Desa", href: "/admin/profil" },
   { label: "UMKM", href: "/admin/umkm" },
   { label: "Regulasi Desa", href: "/admin/landasan-hukum" },

@@ -10,9 +10,15 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogPage() {
-  const posts = await prisma.post.findMany({
-    orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
-  });
+  const [posts, kknReports] = await Promise.all([
+    prisma.post.findMany({
+      orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
+    }),
+    prisma.kknReport.findMany({
+      select: { id: true, title: true, description: true, createdAt: true },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -22,13 +28,13 @@ export default async function BlogPage() {
           Berita &amp; Pengumuman
         </h1>
         <p className="mt-3 max-w-2xl text-ink-900/70">
-          Pengumuman resmi dan berita kegiatan Desa Pranggong dalam satu
-          kanal. Saring berdasarkan kategori di bawah.
+          Pengumuman resmi, berita kegiatan, dan laporan Program KKN Desa
+          Pranggong dalam satu kanal. Saring berdasarkan kategori di bawah.
         </p>
       </Reveal>
 
       <div className="mt-8">
-        <PostList posts={posts} />
+        <PostList posts={posts} kknReports={kknReports} />
       </div>
     </div>
   );
