@@ -9,9 +9,12 @@ export default function Footer() {
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-moss-600 text-xs font-semibold text-paper-50">
-              DP
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.svg"
+              alt="Logo Desa Pranggong"
+              className="h-8 w-8 shrink-0 object-contain"
+            />
             <h2 className="font-display text-lg font-semibold">{siteConfig.name}</h2>
           </div>
           <p className="mt-3 max-w-xs text-sm text-ink-900/60">

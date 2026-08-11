@@ -63,6 +63,27 @@
 
 ## Log Pengerjaan
 
+### 2026-08-11 — Ganti monogram "DP" jadi logo asli (SVG Kabupaten Boyolali)
+Navbar & Footer sebelumnya cuma pakai placeholder monogram teks "DP" dalam kotak hijau (`bg-moss-600 rounded-xl`) — desa belum punya logo resmi sendiri (masih pertanyaan terbuka di `requirement.md` §8). User kirim file logo Kabupaten Boyolali (`boyolali-seeklogo.svg`, vector murni ~453KB, tidak ada raster ter-embed) untuk dipakai sebagai logo situs.
+
+- File disalin ke `public/logo.svg`. Dipakai `<img>` biasa (konsisten pola project, belum pernah pakai `next/image`).
+- Kotak hijau + teks "DP" di `navbar.tsx` (h-9 w-9) dan `footer.tsx` (h-8 w-8) diganti langsung jadi `<img src="/logo.svg">` dengan `object-contain` — TIDAK pakai background/rounded box lagi karena logo aslinya sudah punya desain visual sendiri (kotak hijau di belakangnya cuma cocok untuk placeholder monogram teks, bukan untuk logo asli).
+- **Susulan sama hari**: user tanya apakah favicon (yang tampil di tab browser & hasil pencarian Google) ikut berubah — awalnya TIDAK, karena favicon itu file terpisah (`src/app/favicon.ico`, bawaan default Next.js dari setup awal, belum pernah disentuh sejak 13 Juli). User minta diganti juga.
+  - `src/app/favicon.ico` (default Next.js) **dihapus**, diganti `src/app/icon.svg` (isinya logo yang sama, `public/logo.svg`) — pakai konvensi file Next.js App Router (`app/icon.svg`, dicek dulu ke `node_modules/next/dist/docs/.../app-icons.md` sesuai `AGENTS.md`, bukan diasumsikan dari pengetahuan versi Next.js lama). Next.js otomatis generate tag `<link rel="icon">` yang sesuai, tidak perlu sentuh `layout.tsx` sama sekali.
+  - **Dikasih tahu ke user sebagai catatan, bukan cuma dieksekusi diam-diam**: logo ini detail/beresolusi tinggi (lambang, banyak elemen kecil) — di ukuran favicon yang sangat kecil (16×16/32×32px) kemungkinan cuma kelihatan seperti bercak warna, bukan lambang yang jelas. User tetap minta diganti meski sudah diberi tahu risiko ini.
+  - **Perubahan ini tidak instan terlihat di Google** — meski file sudah diganti di kode & production, Google butuh re-crawl (bisa berhari-hari/minggu) untuk update ikon yang ditampilkan di halaman hasil pencariannya. Ini di luar kendali kode, cuma soal waktu crawl Google.
+- Verifikasi: `npm run lint` bersih, `npm run build` sukses — `/icon.svg` muncul sebagai route statis baru di build output, `favicon.ico` tidak lagi ter-generate.
+- **Belum dicek visual di browser** — SVG ini tidak punya atribut `viewBox` (cuma `width`/`height` mentah), yang secara teori tetap aman untuk tag `<img>`/favicon (browser scale seluruh render ke box gambar), tapi tetap perlu dipastikan tampil proporsional & tidak pecah di ukuran kecil (36px/32px di navbar-footer, apalagi 16×16 di favicon) — logo sumber beresolusi tinggi (1528×2000) jadi detail halus mungkin hilang di ukuran sekecil itu.
+
+### 2026-08-11 — Section "Peta Fisik Desa" di `/peta-desa` (2 foto asli + spesifikasi struktur)
+User minta section baru menjelaskan peta fisik (papan informasi/plang outdoor) yang sudah dicetak & dipasang tim KKN — beda dari peta interaktif Leaflet yang sudah ada di halaman yang sama. User kasih 2 file foto asli langsung (bukan placeholder): desain teknis papan (gambar CAD, latar putih) dan hasil akhir terpasang di lokasi (foto lapangan).
+
+- **Foto disimpan sebagai static asset** di `public/peta-desa/peta-fisik-desain.jpeg` (63KB) dan `peta-fisik-terpasang.jpeg` (555KB) — bukan lewat DB/Bytes seperti pola KKN Report/Landasan Hukum, karena ini konten tetap yang di-set developer sekali (bukan data yang diinput admin berulang lewat form), jadi cukup file statis di `public/` seperti favicon dkk. Dipakai `<img>` biasa (bukan `next/image`) — konsisten dengan pola yang sudah dipakai di semua tempat lain di project ini (project belum pernah pakai `next/image` sama sekali).
+- **Layout gambar**: 2 foto ini beda orientasi jauh (desain CAD landscape ~1207×834, foto lapangan portrait 1462×1600) — kalau dipaksa `object-cover` dengan aspect ratio sama, salah satu pasti kepotong parah (terutama dimensi angka di gambar CAD). Solusi: wrapper `h-64 sm:h-80` dengan `object-contain` + background `bg-paper-100`, jadi kedua foto tampil utuh tanpa terpotong meski aspect rasio beda, sambil tetap dapat card tinggi seragam di grid 2 kolom.
+- **Konten teks** (spesifikasi struktur: rangka besi 3cm, papan latar triplek 1,2cm, atap galvalum; lokasi di calon Taman Desa Pranggong) disalin persis dari teks yang diberikan user, disusun ulang jadi: paragraf intro → grid 2 foto dengan caption → 3 kartu spesifikasi (pola sama seperti kartu "Data Wilayah" di `/profil-desa`, bukan pola dark-band "Spesifikasi Teknis" Rocket Stove, karena `/peta-desa` full light theme di sepanjang halaman) → paragraf lokasi/tujuan penempatan.
+- Verifikasi: `npm run lint` bersih, `npm run build` sukses, `/peta-desa` tetap ter-generate statis (○, tidak jadi dinamis meski nambah asset).
+- **Belum dicek visual di browser** — terutama apakah ukuran `h-64 sm:h-80` pas untuk foto CAD (banyak whitespace di sekitar gambar karena `object-contain` dengan background terang) dan foto lapangan (background natural terang, cek kontrasnya masih kebaca di atas `bg-paper-100`).
+
 ### 2026-08-11 — Komponen dropzone gambar untuk form admin (ganti `<Input type="file">` basic)
 User minta input gambar di form admin "diperbagus" (pakai skill `frontend-design`) — sebelumnya cuma `<Input type="file">` bawaan shadcn, tidak ada preview/drag-and-drop.
 

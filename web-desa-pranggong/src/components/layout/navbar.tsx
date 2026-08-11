@@ -18,9 +18,12 @@ export default function Navbar() {
           className="flex items-center gap-3"
           onClick={() => setOpen(false)}
         >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-moss-600 text-sm font-semibold text-paper-50">
-            DP
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.svg"
+            alt="Logo Desa Pranggong"
+            className="h-9 w-9 shrink-0 object-contain"
+          />
           <span className="leading-tight">
             <span className="block font-display text-lg font-semibold text-ink-900">
               {siteConfig.name}
