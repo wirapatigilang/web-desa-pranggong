@@ -63,6 +63,29 @@
 
 ## Log Pengerjaan
 
+### 2026-08-11 — Redesain section "Spesifikasi Teknis" Rocket Stove (pakai skill `frontend-design`)
+Setelah foto diagram dipasang, section ini kelihatan sepi — diagram square di kiri jauh lebih tinggi dari `dl` 2 item polos di kanan yang di-`self-start` (banyak ruang kosong di bawah teks). User minta dibikin lebih menarik, eksplisit pakai skill `frontend-design`.
+
+- Ditambah `<h2>` "Detail Konstruksi" di bawah Eyebrow — section ini sebelumnya satu-satunya section di halaman yang cuma punya Eyebrow tanpa heading, sekarang konsisten dengan section lain.
+- Panel diagram dikasih label kecil "Gambar teknik" (pill putih pojok kiri-atas) dan `min-h-80` + `items-stretch` di grid supaya tinggi kolom kanan otomatis mengikuti tinggi diagram (bukan lagi `self-start` yang bikin dl "ngambang" pendek di atas).
+- `dl` 2 kolom teks polos diganti 2 **kartu ikon** (`rounded-2xl border border-paper-50/10 bg-paper-50/5`, `h-full flex flex-col` biar tinggi kartu menyesuaikan grid row) — masing-masing ada ikon bulat (`Blocks` untuk Bahan Utama, `Flame` untuk Bentuk Ruang Bakar, dari `lucide-react`, sudah dipakai di project ini sebelumnya jadi tidak nambah dependency baru).
+- List 6 bahan (Hebel, Lem Hebel, dst) yang tadinya `<ul><li>` polos diubah jadi **chip/pill** (`rounded-full border`) yang wrap — mengisi ruang horizontal kartu lebih baik dan konsisten dengan pola chip yang sudah dipakai di `/peta-desa` & `/blog`.
+- Kartu "Bentuk Ruang Bakar" ditambah 1 kalimat penjelasan (dikutip ulang dari fakta yang SUDAH ada di paragraf intro "Apa Itu Rocket Stove" di section atas — bukan fakta baru yang dikarang) supaya kartu ini tidak terasa lebih kosong dari kartu bahan di sebelahnya.
+- **Sengaja TIDAK pakai angka urut (01/02)** meski cuma 2 item — dua spec ini bukan proses berurutan, jadi penanda ordinal akan menyesatkan (sesuai prinsip skill: numbering cuma untuk konten yang memang sequence).
+- Verifikasi: `npm run lint` bersih (kecuali 1 warning pre-existing `socialization` unused, di luar scope), `npm run build` sukses (21 route, tidak berubah).
+- **Belum dicek visual di browser** — terutama apakah tinggi 2 kartu kanan sudah pas menyamai tinggi diagram kiri di berbagai lebar layar (grid `items-stretch` cuma jalan di breakpoint `lg:` ke atas, di mobile tetap stack vertikal biasa).
+
+### 2026-08-11 — Foto dokumentasi asli menggantikan placeholder di Rocket Stove
+User kirim foto asli untuk mengisi slot `ImagePlaceholder` di `/program-kerja/rocket-stove`. Sempat ketemu kemungkinan salah tempel (3 slot beda dikasih file yang sama) — dicek isinya satu-satu, dikonfirmasi ke user pakai mapping yang lebih masuk akal berdasarkan konten tiap foto (bukan langsung dituruti apa adanya).
+
+- 4 foto disalin ke `public/rocket-stove/`: `tungku-jadi.jpeg` (tungku sudah diplester halus, berdiri di halaman), `persiapan-bahan.jpeg` (orang mengaduk semen pakai gerobak dorong), `proses-perakitan.jpeg` (tungku hebel masih kasar/belum diplester, alat & ember semen berserakan), `diagram-spesifikasi.jpeg` (diagram CAD 3D struktur tungku, dikirim belakangan khusus untuk section Spesifikasi Teknis — awalnya sempat dipakaikan `proses-perakitan.jpeg` juga sebelum user kasih file yang lebih tepat).
+- Mapping final: "Apa Itu Rocket Stove" → `tungku-jadi`; "Persiapan bahan & alat" → `persiapan-bahan`; "Proses perakitan tungku" → `proses-perakitan`; "Hasil akhir" → `tungku-jadi` (dipakai 2×, satu-satunya foto hasil jadi yang ada); "Spesifikasi Teknis" → `diagram-spesifikasi`.
+- Komponen `ImagePlaceholder` (dan importnya) sudah tidak dipakai lagi di halaman ini — dihapus. Kalimat "Foto dokumentasi asli menyusul dari tim KKN — placeholder di atas menandai slot yang akan diisi." di bawah section Dokumentasi juga dihapus karena sudah tidak relevan.
+- **Perlakuan gambar beda per jenis konten**: foto asli (`tungku-jadi`, `persiapan-bahan`, `proses-perakitan`) pakai `object-cover` penuh — aman di-crop karena themanya foto lapangan biasa. Diagram CAD (`diagram-spesifikasi`, latar putih/abu muda) pakai `object-contain` + padding di atas `bg-paper-100`, BUKAN `object-cover` — supaya tidak ada bagian diagram yang kepotong (pola sama dengan penanganan foto desain teknis peta fisik di log sebelumnya).
+- **Ditemukan bug lama yang TIDAK diperbaiki (di luar scope)**: variabel `socialization` (data "Dokumentasi Sosialisasi") ternyata terdefinisi di kode tapi tidak pernah dirender di JSX — begitu juga section "Galeri Sebelum-Sesudah" yang sempat tercatat selesai di log lama ternyata sudah hilang dari halaman (kemungkinan terhapus saat ada suntingan manual lewat IDE sebelumnya). Sudah diberi tahu ke user, belum diperbaiki karena bukan yang diminta sesi ini — masih ada warning lint `'socialization' is assigned a value but never used`.
+- Verifikasi: `npm run lint` bersih (kecuali 1 warning pre-existing di atas), `npm run build` sukses (21 route, tidak ada perubahan jumlah route).
+- **Belum dicek visual di browser** — terutama apakah crop `object-cover` pada foto lapangan (terutama `19.59.56` yang portrait 2340×4160, dipaksa ke aspect 4:3) memotong bagian penting dari tungku.
+
 ### 2026-08-11 — Ganti monogram "DP" jadi logo asli (SVG Kabupaten Boyolali)
 Navbar & Footer sebelumnya cuma pakai placeholder monogram teks "DP" dalam kotak hijau (`bg-moss-600 rounded-xl`) — desa belum punya logo resmi sendiri (masih pertanyaan terbuka di `requirement.md` §8). User kirim file logo Kabupaten Boyolali (`boyolali-seeklogo.svg`, vector murni ~453KB, tidak ada raster ter-embed) untuk dipakai sebagai logo situs.
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Blocks, Flame } from "lucide-react";
 import Eyebrow from "@/components/ui/eyebrow";
-import ImagePlaceholder from "@/components/ui/image-placeholder";
 import HoverArrow from "@/components/ui/hover-arrow";
 import Reveal, { RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { contactInfo } from "@/lib/site-config";
@@ -17,16 +17,19 @@ const buildSteps = [
     title: "Persiapan bahan & alat",
     description:
       "Dokumentasi bahan (drum/kaleng bekas, semen, pasir, isolator) dan alat yang dipakai sebelum perakitan.",
+    image: "/rocket-stove/persiapan-bahan.jpeg",
   },
   {
     title: "Proses perakitan tungku",
     description:
       "Dokumentasi tahap perakitan ruang bakar berbentuk L dan pemasangan isolator di sekitar pipa pembakaran.",
+    image: "/rocket-stove/proses-perakitan.jpeg",
   },
   {
     title: "Hasil akhir",
     description:
       "Dokumentasi tungku yang sudah jadi beserta uji nyala pertama di lokasi demo.",
+    image: "/rocket-stove/tungku-jadi.jpeg",
   },
 ];
 
@@ -68,7 +71,15 @@ export default function RocketStovePage() {
             <p className="max-w-2xl text-ink-900/70">
               Rocket Stove adalah inovasi tungku masak sederhana yang dirancang khusus dengan ruang bakar berbentuk huruf L atau J yang terisolasi dengan baik. Desain struktural ini memastikan aliran udara atau sirkulasi oksigen bekerja secara optimal, sehingga ranting atau kayu bakar dapat terbakar jauh lebih sempurna pada suhu yang sangat tinggi. Panas yang dihasilkan tidak menyebar sia-sia, melainkan terpusat langsung ke bagian bawah alat masak. Sistem pembakaran cerdas ini memberikan keuntungan yang signifikan: jumlah bahan bakar yang dibutuhkan menjadi jauh lebih efisien, proses memasak menjadi lebih cepat, dan kepulan asap yang dihasilkan berkurang secara drastis dibandingkan dengan tungku terbuka konvensional, sehingga menciptakan lingkungan dapur yang lebih sehat dan bersih.
             </p>
-            <ImagePlaceholder label="Foto/diagram Rocket Stove" />
+            <div className="aspect-[4/3] overflow-hidden rounded-2xl border border-black/5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/rocket-stove/tungku-jadi.jpeg"
+                alt="Tungku Rocket Stove hasil program kerja KKN di Desa Pranggong"
+                className="h-full w-full object-cover"
+                style={{ objectPosition: "center 75%" }}
+              />
+            </div>
           </div>
         </Reveal>
       </section>
@@ -84,7 +95,7 @@ export default function RocketStovePage() {
           </Reveal>
           <RevealGroup className="mt-6 grid gap-6 sm:grid-cols-3">
             {[
-              {
+            {
                 title: "Hemat Bahan Bakar",
                 description:
                   "Pembakaran lebih efisien berarti kayu bakar yang dibutuhkan untuk memasak lebih sedikit dari biasanya.",
@@ -127,7 +138,14 @@ export default function RocketStovePage() {
           {buildSteps.map((step) => (
             <RevealItem key={step.title}>
               <div>
-                <ImagePlaceholder label={step.title} />
+                <div className="aspect-[4/3] overflow-hidden rounded-2xl border border-black/5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={step.image}
+                    alt={step.title}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
                 <p className="mt-3 font-display text-base font-semibold text-ink-900">
                   {step.title}
                 </p>
@@ -138,10 +156,6 @@ export default function RocketStovePage() {
             </RevealItem>
           ))}
         </RevealGroup>
-        <p className="mt-4 text-xs text-ink-900/50">
-          Foto dokumentasi asli menyusul dari tim KKN — placeholder di atas
-          menandai slot yang akan diisi.
-        </p>
       </section>
 
       {/* Spesifikasi teknis */}
@@ -149,110 +163,73 @@ export default function RocketStovePage() {
         <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
           <Reveal>
             <Eyebrow onDark>Spesifikasi Teknis</Eyebrow>
-            <div className="mt-3 grid gap-8 md:grid-cols-[1fr_1.2fr]">
-              <ImagePlaceholder
-                label="Diagram ukuran & bagian Rocket Stove"
-                aspect="aspect-square"
-              />
-              <dl className="grid grid-cols-2 gap-x-6 gap-y-4 self-start text-sm">
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-paper-50/50">
-                    Bahan utama
-                  </dt>
-                  <dd className="mt-1 text-paper-50/90">
-                    Menyusul — dokumentasi tim KKN
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-paper-50/50">
-                    Dimensi
-                  </dt>
-                  <dd className="mt-1 text-paper-50/90">
-                    Menyusul — dokumentasi tim KKN
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-paper-50/50">
-                    Bentuk ruang bakar
-                  </dt>
-                  <dd className="mt-1 text-paper-50/90">
-                    L-shaped (khas Rocket Stove)
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-paper-50/50">
-                    Isolator
-                  </dt>
-                  <dd className="mt-1 text-paper-50/90">
-                    Menyusul — dokumentasi tim KKN
-                  </dd>
-                </div>
-              </dl>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* Sosialisasi */}
-      <section className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
-        <Reveal>
-          <Eyebrow>Kegiatan</Eyebrow>
-          <h2 className="mt-3 font-display text-2xl font-semibold text-ink-900">
-            Sosialisasi &amp; Pelatihan Warga
-          </h2>
-        </Reveal>
-        <RevealGroup className="mt-6 grid gap-6 sm:grid-cols-2">
-          {socialization.map((item) => (
-            <RevealItem key={item.title}>
-              <div>
-                <ImagePlaceholder label={item.title} aspect="aspect-video" />
-                <p className="mt-3 font-display text-base font-semibold text-ink-900">
-                  {item.title}
-                </p>
-                <p className="mt-1 text-sm text-ink-900/70">
-                  {item.description}
-                </p>
-              </div>
-            </RevealItem>
-          ))}
-        </RevealGroup>
-      </section>
-
-      {/* Galeri sebelum-sesudah */}
-      <section className="bg-paper-100">
-        <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
-          <Reveal>
-            <Eyebrow>Galeri</Eyebrow>
-            <h2 className="mt-3 font-display text-2xl font-semibold text-ink-900">
-              Sebelum &amp; Sesudah
+            <h2 className="mt-3 font-display text-2xl font-semibold">
+              Detail Konstruksi
             </h2>
           </Reveal>
-          <RevealGroup className="mt-6 grid gap-6 sm:grid-cols-2">
-            <RevealItem>
-              <div>
-                <ImagePlaceholder
-                  label="Kondisi dapur sebelum"
-                  aspect="aspect-video"
+
+          <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-stretch">
+            <Reveal delay={0.05}>
+              <div className="relative flex h-full min-h-80 items-center justify-center overflow-hidden rounded-2xl border border-paper-50/10 bg-paper-100 p-8">
+                <span className="absolute top-4 left-4 rounded-full border border-moss-900/15 bg-paper-50 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-moss-600 uppercase">
+                  Gambar teknik
+                </span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/rocket-stove/diagram-spesifikasi.jpeg"
+                  alt="Diagram struktur dan bagian-bagian Rocket Stove"
+                  className="max-h-full max-w-full object-contain"
                 />
-                <p className="mt-2 text-center text-xs font-semibold uppercase tracking-wide text-ink-900/50">
-                  Sebelum
-                </p>
               </div>
-            </RevealItem>
-            <RevealItem>
-              <div>
-                <ImagePlaceholder
-                  label="Kondisi dapur sesudah pakai Rocket Stove"
-                  aspect="aspect-video"
-                />
-                <p className="mt-2 text-center text-xs font-semibold uppercase tracking-wide text-ink-900/50">
-                  Sesudah
-                </p>
-              </div>
-            </RevealItem>
-          </RevealGroup>
+            </Reveal>
+
+            <RevealGroup className="grid gap-4">
+              <RevealItem>
+                <div className="flex h-full flex-col rounded-2xl border border-paper-50/10 bg-paper-50/5 p-6">
+                  <span className="flex size-10 items-center justify-center rounded-xl bg-paper-50/10 text-paper-50">
+                    <Blocks aria-hidden="true" className="size-5" />
+                  </span>
+                  <p className="mt-4 text-xs font-semibold tracking-wide text-paper-50/50 uppercase">
+                    Bahan Utama
+                  </p>
+                  <ul className="mt-3 flex flex-wrap gap-2">
+                    {["Hebel", "Lem Hebel", "Semen", "Pasir", "Besi Beton 10 mm", "Plat Besi"].map(
+                      (material) => (
+                        <li
+                          key={material}
+                          className="rounded-full border border-paper-50/15 px-3 py-1 text-xs text-paper-50/90"
+                        >
+                          {material}
+                        </li>
+                      ),
+                    )}
+                  </ul>
+                </div>
+              </RevealItem>
+
+              <RevealItem>
+                <div className="flex h-full flex-col rounded-2xl border border-paper-50/10 bg-paper-50/5 p-6">
+                  <span className="flex size-10 items-center justify-center rounded-xl bg-paper-50/10 text-paper-50">
+                    <Flame aria-hidden="true" className="size-5" />
+                  </span>
+                  <p className="mt-4 text-xs font-semibold tracking-wide text-paper-50/50 uppercase">
+                    Bentuk Ruang Bakar
+                  </p>
+                  <p className="mt-2 text-sm font-medium text-paper-50/90">
+                    L-shaped (khas Rocket Stove)
+                  </p>
+                  <p className="mt-2 text-sm text-paper-50/60">
+                    Ruang bakar berbentuk L menjaga sirkulasi udara tetap
+                    optimal, sehingga bahan bakar terbakar lebih sempurna dan
+                    panas terpusat ke alat masak.
+                  </p>
+                </div>
+              </RevealItem>
+            </RevealGroup>
+          </div>
         </div>
       </section>
+
 
       {/* Kontak & tautan peta */}
       <section className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
